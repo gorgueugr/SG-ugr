@@ -23,8 +23,6 @@ class Robot extends THREE.Object3D {
         this.arm.add(new THREE.Mesh (
                 geometry,material));
         geometry = new THREE.CylinderGeometry()
-
-        asas
     }
 
     createHead(){
