@@ -16,7 +16,8 @@ class TheScene extends THREE.Scene {
     this.trackballControls = null;
     this.crane = null;
     this.ground = null;
-  
+    this.arm = null;
+
     this.createLights ();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
@@ -66,8 +67,8 @@ class TheScene extends THREE.Scene {
    */
   createModel () {
     var model = new THREE.Object3D()
-    this.crane = new Crane({});
-    model.add (this.crane);
+    this.arm = new Robot({});
+    model.add (this.arm);
     var loader = new THREE.TextureLoader();
     var textura = loader.load ("imgs/wood.jpg");
     this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial ({map: textura}), 4);
