@@ -12,7 +12,7 @@ class Robot extends THREE.Object3D {
         this.body = null;
         this.head = null;
 
-        this.material = new THREE.MeshPhongMaterial ({color: 0xd4af37, specular: 0xfbf804, shininess: 70});
+        this.material = new THREE.MeshPhongMaterial ({color: 0x5E3EFC, specular: 0xfbf804, shininess: 70});
 
         this.arms = this.createArms(5);
         this.head = this.createHead();
