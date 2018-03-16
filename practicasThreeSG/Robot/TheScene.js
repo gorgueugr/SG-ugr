@@ -105,7 +105,11 @@ class TheScene extends THREE.Scene {
   animate (controls) {
     this.axis.visible = controls.axis;
     this.spotLight.intensity = (controls.turnLight === true ? controls.lightIntensity : 0);
-    //this.spotLight.intensity = controls.lightIntensity ;
+    this.robot.setHeight(controls.height);
+    this.robot.setHeadRotation(controls.rotation);
+    this.robot.setBodyRotation(controls.rotationBody);
+
+      //this.spotLight.intensity = controls.lightIntensity ;
   }
   
   /// It returns the camera

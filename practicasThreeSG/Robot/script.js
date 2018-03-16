@@ -25,9 +25,11 @@ function createGUI (withStats) {
     this.axis = true;
     this.turnLight = true;
     this.lightIntensity = 0.5;
-    this.rotation = 6;
-    this.distance = 10;
-    this.height   = 10;
+    //Robot
+    this.rotation = 0.0;
+    this.rotationBody = 0.0;
+    this.height   = 0.0;
+    //
     this.addBox   = function () {
       setMessage ("Añadir cajas clicando en el suelo");
       applicationMode = TheScene.ADDING_BOXES;
@@ -48,7 +50,12 @@ function createGUI (withStats) {
     var addingBoxes = actions.add(GUIcontrols, 'addBox').name (': Adding boxes :');
     var movingBoxes = actions.add (GUIcontrols, 'moveBox').name (': Move and rotate boxes :');
 
-  if (withStats)
+    var robot = gui.addFolder('Robot');
+      robot.add(GUIcontrols, 'height', 0, 2.0).name(':Altura del robot :');
+      robot.add(GUIcontrols, 'rotation', -1.4, 1.4).name(':Cabeza del robot :');
+      robot.add(GUIcontrols, 'rotationBody', -0.75, 0.5).name(':Cuerpo del robot :');
+
+    if (withStats)
     stats = initStats();
 }
 
