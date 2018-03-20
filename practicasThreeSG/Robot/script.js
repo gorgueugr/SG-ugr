@@ -201,12 +201,16 @@ function render() {
   stats.update();
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
-  
+  scene.updatePhysics();
+
   renderer.render(scene, scene.getCamera());
 }
 
+
 /// The main function
 $(function () {
+
+
   // create a render and set the size
   renderer = createRenderer();
   // add the output of the renderer to the html element
@@ -221,7 +225,7 @@ $(function () {
   
   // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement);
- 
+
   createGUI(true);
 
   render();

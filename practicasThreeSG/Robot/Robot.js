@@ -21,8 +21,12 @@ class Robot extends THREE.Object3D {
 
         this.bodyTexture =  loader.load ( 'imgs/body.JPG' );
         this.bodyMaterial = new THREE.MeshPhongMaterial( { map:  this.bodyTexture, specular: 0xffffff, shininess: 15} );
+        this.bodyTexture.wrapS = this.bodyTexture.wrapT = THREE.RepeatWrapping;
+
         this.headTexture = loader.load ( 'imgs/head.JPG' );
         this.headMaterial = new THREE.MeshPhongMaterial( { map:  this.headTexture, specular: 0xffffff ,shininess: 15} );
+        this.headTexture.wrapS = this.headTexture.wrapT = THREE.RepeatWrapping;
+
 
         this.model = this.createModel();
 
@@ -103,7 +107,8 @@ class Robot extends THREE.Object3D {
             new THREE.CylinderGeometry(2,2,4,16,1,false),
             this.bodyMaterial
         );
-
+        this.body.material.map.offset.set(0.15,0);
+        this.body.material.map.repeat.set(1,1);
         this.body.geometry.translate(0,-2,0);
         this.body.add(this.createHead());
 
@@ -124,11 +129,14 @@ class Robot extends THREE.Object3D {
     setHeight(height){
         if(height>=0 && height<=2){
             this.body.position.y = height + 5;
-            for(var i =0;i<this.shoulders.length;i++)
-                this.shoulders[i].position.y = height + 4;
-            for(var i =0;i<this.legs.length;i++)
-                this.legs[i].scale.y = height + 4 ;
+            //for(var i =0;i<this.shoulders.length;i++)
+            this.shoulders[0].position.y = height + 4;
+            this.shoulders[1].position.y = height + 4;
+            //for(var i =0;i<this.legs.length;i++)
+            this.legs[0].scale.y = height + 4 ;
+            this.legs[1].scale.y = height + 4 ;
         }
+
     }
 
     setHeadRotation(angle){

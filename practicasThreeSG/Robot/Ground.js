@@ -23,11 +23,14 @@ class Ground extends THREE.Object3D {
     this.boxes  = null;
     
     this.box    = null;
+
     this.raycaster = new THREE.Raycaster ();  // To select boxes
   
     this.ground = new THREE.Mesh (
       new THREE.BoxGeometry (this.width, 0.2, this.deep, 1, 1, 1),
-      this.material);
+      this.material
+    );
+
     this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,-0.1,0));
     this.ground.receiveShadow = true;
     this.ground.autoUpdateMatrix = false;

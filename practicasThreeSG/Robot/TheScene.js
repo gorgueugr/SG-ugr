@@ -14,14 +14,23 @@ class TheScene extends THREE.Scene {
     this.spotLight = null;
     this.camera = null;
     this.trackballControls = null;
+    //Objects
     this.ground = null;
     this.robot = null;
+
+    this.ovobu = null;
+    this.ovoma = null;
+
+    this.world = new WorldScene();
 
     this.createLights ();
     this.createCamera (renderer);
     this.axis = new THREE.AxisHelper (25);
     this.add (this.axis);
     this.model = this.createModel ();
+
+      this.world.addBody(this.ovobu);
+      this.world.addBody(this.ovoma);
     this.add (this.model);
   }
   
@@ -72,11 +81,21 @@ class TheScene extends THREE.Scene {
 
     this.robot = new Robot();
 
-    model.add (this.ground);
+      this.ovobu = new OvoBu();
+      this.ovoma = new OvoMa();
+
+      this.ovobu.position.x = 10;
+      this.ovoma.position.z = 30;
+
+      this.ovobu.position.y = 25;
+      this.ovoma.position.y = 25;
+
+      model.add (this.ground);
     model.add(this.robot);
+    model.add(this.ovobu);
+    model.add(this.ovoma);
     return model;
   }
-  
   // Public methods
 
   /// It adds a new box, or finish the action
@@ -136,8 +155,20 @@ class TheScene extends THREE.Scene {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
   }
+
+  updatePhysics(){
+    this.world.world.step(1/60);
+
+    this.ovobu.position.copy(this.world.bodies[0].position);
+    this.ovobu.quaternion.copy(this.world.bodies[0].quaternion);
+
+    this.ovoma.position.copy(this.world.bodies[1].position);
+    this.ovoma.quaternion.copy(this.world.bodies[1].quaternion);
+
+  }
   
 }
+
 
   // class variables
   
