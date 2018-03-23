@@ -13,6 +13,9 @@ class Ground extends THREE.Object3D {
 
   constructor (aWidth, aDeep, aMaterial, aBoxSize) {
     super();
+
+
+
     
     this.width = aWidth;
     this.deep = aDeep;
