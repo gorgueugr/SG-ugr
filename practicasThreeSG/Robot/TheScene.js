@@ -3,12 +3,13 @@
 /**
  * @param renderer - The renderer to visualize the scene
  */
-class TheScene extends THREE.Scene {
+class TheScene extends WorldScene {
   
   constructor (renderer) {
     super();
     
     // Attributes
+      this.world.gravity.set(0,-9.82,0);
     
     this.ambientLight = null;
     this.spotLight = null;
@@ -21,7 +22,6 @@ class TheScene extends THREE.Scene {
     this.ovobu = null;
     this.ovoma = null;
 
-    this.world = new WorldScene();
 
     this.createLights ();
     this.createCamera (renderer);
@@ -29,8 +29,6 @@ class TheScene extends THREE.Scene {
     this.add (this.axis);
     this.model = this.createModel ();
 
-      this.world.addBody(this.ovobu);
-      this.world.addBody(this.ovoma);
     this.add (this.model);
   }
   
@@ -84,16 +82,21 @@ class TheScene extends THREE.Scene {
       this.ovobu = new OvoBu();
       this.ovoma = new OvoMa();
 
+
       this.ovobu.position.x = 10;
-      this.ovoma.position.z = 30;
+      this.ovoma.position.z = 10;
 
       this.ovobu.position.y = 25;
       this.ovoma.position.y = 25;
 
-      model.add (this.ground);
+    //  model.add (this.ground);
     model.add(this.robot);
-    model.add(this.ovobu);
-    model.add(this.ovoma);
+
+    this.addPhysicalObject(this.ground);
+    this.addPhysicalObject(this.ovobu);
+    this.addPhysicalObject(this.ovoma);
+    //model.add(this.ovobu);
+    //model.add(this.ovoma);
     return model;
   }
   // Public methods
@@ -156,17 +159,6 @@ class TheScene extends THREE.Scene {
     this.camera.updateProjectionMatrix();
   }
 
-  updatePhysics(){
-    this.world.world.step(1/60);
-
-    this.ovobu.position.copy(this.world.bodies[0].position);
-    this.ovobu.quaternion.copy(this.world.bodies[0].quaternion);
-
-    this.ovoma.position.copy(this.world.bodies[1].position);
-    this.ovoma.quaternion.copy(this.world.bodies[1].quaternion);
-
-  }
-  
 }
 
 

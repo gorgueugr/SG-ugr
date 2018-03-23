@@ -9,7 +9,7 @@
  * @param aBoxSize - The size for the boxes
  */
 
-class Ground extends THREE.Object3D {
+class Ground extends PhysicObject {
 
   constructor (aWidth, aDeep, aMaterial, aBoxSize) {
     super();
@@ -28,13 +28,17 @@ class Ground extends THREE.Object3D {
     this.box    = null;
 
     this.raycaster = new THREE.Raycaster ();  // To select boxes
-  
+
+    this.shape = new CANNON.Box(new CANNON.Vec3(this.width/2,1,this.deep/2));
+    this.body = new CANNON.Body({mass:0});
+    this.body.addShape(this.shape);
+
     this.ground = new THREE.Mesh (
-      new THREE.BoxGeometry (this.width, 0.2, this.deep, 1, 1, 1),
+      new THREE.BoxGeometry (this.width, 2, this.deep, 1, 1, 1),
       this.material
     );
 
-    this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,-0.1,0));
+    this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,-1,0));
     this.ground.receiveShadow = true;
     this.ground.autoUpdateMatrix = false;
     this.add (this.ground);
