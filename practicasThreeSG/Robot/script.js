@@ -16,6 +16,8 @@ mouseDown = false;
 /// The current mode of the application
 applicationMode = TheScene.NO_ACTION;
 
+//debug
+cannonDebugRenderer = null;
 /// It creates the GUI and, optionally, adds statistic information
 /**
  * @param withStats - A boolean to show the statictics or not
@@ -202,6 +204,7 @@ function render() {
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
   scene.updatePhysics();
+  cannonDebugRenderer.update();      // Update the debug renderer
 
   renderer.render(scene, scene.getCamera());
 }
@@ -225,8 +228,10 @@ $(function () {
   
   // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement);
+  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, scene.world );
 
-  createGUI(true);
+
+    createGUI(true);
 
   render();
 });

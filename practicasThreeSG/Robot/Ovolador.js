@@ -21,7 +21,7 @@ class OvoBu extends Ovolador {
 
     createModel(){
         this.size = 2;
-        this.shape = new CANNON.Sphere(this.size/2);
+        this.shape = new CANNON.Sphere(this.size);
         this.body = new CANNON.Body({mass:10});
         this.body.addShape(this.shape);
 
@@ -30,8 +30,8 @@ class OvoBu extends Ovolador {
             new THREE.SphereGeometry( this.size, 16, 16 ),
             this.material
         );
-        this.model.position.y = this.size;
-
+        //this.model.position.y = this.size;
+        this.updatePhysicPosition();
         return this.model;
     };
 }
@@ -46,7 +46,7 @@ class OvoMa extends Ovolador{
     createModel(){
         this.size = 2;
 
-        this.shape = new CANNON.Cylinder(4,4,this.size*2,8);
+        this.shape = new CANNON.Cylinder(2,2,this.size,16);
         this.body = new CANNON.Body({mass:10});
         this.body.addShape(this.shape);
 
@@ -56,8 +56,9 @@ class OvoMa extends Ovolador{
             new THREE.CylinderGeometry(2,2,this.size,16,1,false),
             this.material,
         );
-        this.model.position.y = this.size/2;
+        //this.model.position.y = this.size/2;
         this.model.rotation.x = 1.57;
+        this.updatePhysicPosition();
         return this.model;
     };
 }

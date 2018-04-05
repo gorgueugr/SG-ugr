@@ -1,6 +1,6 @@
 //made by gorgue
 
-class Robot extends THREE.Object3D {
+class Robot extends PhysicObject {
     constructor(parameters){
         super();
 
@@ -10,7 +10,7 @@ class Robot extends THREE.Object3D {
         this.shoulders = [];
         this.legs = [];
 
-        this.body = null;
+        this.bodyRobot = null;
         this.head = null;
 
         var loader = new THREE.TextureLoader();
@@ -29,8 +29,13 @@ class Robot extends THREE.Object3D {
 
 
         this.model = this.createModel();
-
         this.add(this.model);
+
+        //this.shape = new CANNON.Box(new CANNON.Vec3(3,3,3));
+
+        this.body = new CANNON.Body({mass:10});
+       // this.body.addShape(this.shape);
+
     }
 
     createArm(){
@@ -81,16 +86,20 @@ class Robot extends THREE.Object3D {
 
     createHead(){
 
-        this.head = new THREE.Mesh(
+        this.head = new PhysicMesh(
             new THREE.SphereGeometry(2,16,14,0,6.3,0,1.6),
-            this.headMaterial
+            this.headMaterial,
+            new CANNON.Sphere(1),
+            10
         );
 
         //            new THREE.CylinderGeometry(0.5,0.5,1,16,1,false),
 
-        var eye = new THREE.Mesh(
+        var eye = new PhysicMesh(
             new THREE.SphereGeometry(0.35,16,14,0,6.3,0,1.6),
-            this.blackMaterial
+            this.blackMaterial,
+            new CANNON.Sphere(0.175),
+            10
         );
 
         eye.rotation.x = 1.57;
@@ -98,37 +107,37 @@ class Robot extends THREE.Object3D {
         eye.position.z = 1.6;
 
         this.head.add(eye);
-
+        //this.body.addShape(this.head.body.shapes[0]);
         return this.head;
     }
 
     createBody(){
-        this.body = new THREE.Mesh(
+        this.bodyRobot = new THREE.Mesh(
             new THREE.CylinderGeometry(2,2,4,16,1,false),
             this.bodyMaterial
         );
-        this.body.material.map.offset.set(0.15,0);
-        this.body.material.map.repeat.set(1,1);
-        this.body.geometry.translate(0,-2,0);
-        this.body.add(this.createHead());
+        this.bodyRobot.material.map.offset.set(0.15,0);
+        this.bodyRobot.material.map.repeat.set(1,1);
+        this.bodyRobot.geometry.translate(0,-2,0);
+        this.bodyRobot.add(this.createHead());
 
-        this.body.position.y = 1;
+        this.bodyRobot.position.y = 1;
 
-        return this.body;
+        return this.bodyRobot;
     }
 
     createModel(){
-        this.model = new THREE.Mesh();
+        this.model = new PhysicMesh();
         this.createBody();
-        this.body.position.y = 6;
-        this.model.add(this.body);
+        this.bodyRobot.position.y = 6;
+        this.model.add(this.bodyRobot);
         this.model.add(this.createArms());
         return this.model;
     }
 
     setHeight(height){
         if(height>=0 && height<=2){
-            this.body.position.y = height + 5;
+            this.bodyRobot.position.y = height + 5;
             //for(var i =0;i<this.shoulders.length;i++)
             this.shoulders[0].position.y = height + 4;
             this.shoulders[1].position.y = height + 4;
@@ -146,7 +155,7 @@ class Robot extends THREE.Object3D {
 
     setBodyRotation(angle){
         if(angle>=-0.75 && angle<=0.5)
-            this.body.rotation.x = angle;
+            this.bodyRobot.rotation.x = angle;
     }
 
 }

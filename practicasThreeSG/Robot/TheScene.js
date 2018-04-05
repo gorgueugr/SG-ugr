@@ -90,11 +90,12 @@ class TheScene extends WorldScene {
       this.ovoma.position.y = 25;
 
     //  model.add (this.ground);
-    model.add(this.robot);
-
-    this.addPhysicalObject(this.ground);
-    this.addPhysicalObject(this.ovobu);
-    this.addPhysicalObject(this.ovoma);
+    //model.add(this.robot);
+    this.robot.position.y = 25;
+    this.add(this.robot);
+    this.add(this.ground);
+    this.add(this.ovobu);
+    this.add(this.ovoma);
     //model.add(this.ovobu);
     //model.add(this.ovoma);
     return model;
