@@ -77,10 +77,12 @@ class PhysicMesh extends THREE.Mesh{
             this.body = new CANNON.Body({mass:mass});
             this.body.addShape(this.shape);
         }
-        this.updatePhysicPosition();
+        //this.updatePhysicPosition();
     }
     updatePhysicPosition(){
+
         if(this.body != null) {
+
             this.body.position.set(this.position.x, this.position.y, this.position.z);
             this.body.quaternion.set(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
         }

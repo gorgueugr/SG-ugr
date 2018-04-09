@@ -27,13 +27,27 @@ class Robot extends PhysicObject {
         this.headMaterial = new THREE.MeshPhongMaterial( { map:  this.headTexture, specular: 0xffffff ,shininess: 15} );
         this.headTexture.wrapS = this.headTexture.wrapT = THREE.RepeatWrapping;
 
+        this.body = new CANNON.Body({mass:10});
+
+        this.castShadow = true;
 
         this.model = this.createModel();
         this.add(this.model);
 
+        var bbox = new THREE.Box3().setFromObject(this.model);
+        var a = bbox.getSize()
+        //var abox = new THREE.Vector3(bbox.min);
+        console.log(a);
+
+        this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
+
+
+        //this.body.addShape(new CANNON.Sphere(2),new CANNON.Vec3(0,2.5,0),this.head.geometry.quaternion);
+        //this.body.addShape(new CANNON.Cylinder(2,2,4,16),new CANNON.Vec3(0,2.5,0),this.bodyRobot.geometry.quaternion);
+        this.body.addShape(this.shape,this.position,this.quaternion);
         //this.shape = new CANNON.Box(new CANNON.Vec3(3,3,3));
 
-        this.body = new CANNON.Body({mass:10});
+        this.updatePhysicPosition();
        // this.body.addShape(this.shape);
 
     }
@@ -89,7 +103,7 @@ class Robot extends PhysicObject {
         this.head = new PhysicMesh(
             new THREE.SphereGeometry(2,16,14,0,6.3,0,1.6),
             this.headMaterial,
-            new CANNON.Sphere(1),
+            new CANNON.Sphere(2),
             10
         );
 
@@ -98,7 +112,7 @@ class Robot extends PhysicObject {
         var eye = new PhysicMesh(
             new THREE.SphereGeometry(0.35,16,14,0,6.3,0,1.6),
             this.blackMaterial,
-            new CANNON.Sphere(0.175),
+            new CANNON.Sphere(0.35),
             10
         );
 
@@ -107,7 +121,7 @@ class Robot extends PhysicObject {
         eye.position.z = 1.6;
 
         this.head.add(eye);
-        //this.body.addShape(this.head.body.shapes[0]);
+        //this.body.addShape(this.head.body.shapes[0],this.head.position,this.head.quaternion);
         return this.head;
     }
 
@@ -116,22 +130,25 @@ class Robot extends PhysicObject {
             new THREE.CylinderGeometry(2,2,4,16,1,false),
             this.bodyMaterial
         );
+
         this.bodyRobot.material.map.offset.set(0.15,0);
         this.bodyRobot.material.map.repeat.set(1,1);
         this.bodyRobot.geometry.translate(0,-2,0);
         this.bodyRobot.add(this.createHead());
 
         this.bodyRobot.position.y = 1;
-
         return this.bodyRobot;
     }
 
     createModel(){
-        this.model = new PhysicMesh();
+        this.model = new THREE.Mesh();
         this.createBody();
-        this.bodyRobot.position.y = 6;
+        //this.bodyRobot.position.y = 6;
         this.model.add(this.bodyRobot);
         this.model.add(this.createArms());
+        //this.body = this.head.body;
+        this.model.position.y = -4.5;
+
         return this.model;
     }
 

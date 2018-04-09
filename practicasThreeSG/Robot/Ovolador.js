@@ -6,6 +6,8 @@ class Ovolador extends PhysicObject{
         this.color = null;
         this.material = null;
 
+        this.castShadow = true;
+
         //this.model = this.createModel();
         this.add(this.createModel());
     }
@@ -46,19 +48,31 @@ class OvoMa extends Ovolador{
     createModel(){
         this.size = 2;
 
-        this.shape = new CANNON.Cylinder(2,2,this.size,16);
-        this.body = new CANNON.Body({mass:10});
-        this.body.addShape(this.shape);
-
+        //this.body.quaternion.setFromEuler(0,0,0);
 
         this.material = new THREE.MeshPhongMaterial({color: 0xff0000 , specular: 0x000000});
-        this.model = new THREE.Mesh(
+        this.model = new PhysicMesh(
             new THREE.CylinderGeometry(2,2,this.size,16,1,false),
             this.material,
+            new CANNON.Cylinder(2,2,this.size,16),
+            10
         );
-        //this.model.position.y = this.size/2;
+
+
+        //Mover o rotar el model para ajustar con la fisica,
+        //Para posicionar le objeto tocar this.
+
+        this.position.y = 1;
+        this.rotation.y = 1.57;
+        //this.model.position.y = 1;
         this.model.rotation.x = 1.57;
-        this.updatePhysicPosition();
+
+        this.body = this.model.body;
+
+        //this.model.position.y = this.size/2;
+        //this.model.rotation.x = 1.57;
+        //this.model.updatePhysicPosition();
+        //this.updatePhysicPosition();
         return this.model;
     };
 }

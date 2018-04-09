@@ -29,6 +29,13 @@ class TheScene extends WorldScene {
     this.add (this.axis);
     this.model = this.createModel ();
 
+    /*
+    this.ground.body.addEventListener("collide",function(e){
+        console.log("The sphere just collided with the ground!");
+        console.log("Collided with body:",e.body);
+        console.log("Contact between bodies:",e.contact);
+    });*/
+
     this.add (this.model);
   }
   
@@ -93,6 +100,7 @@ class TheScene extends WorldScene {
     //model.add(this.robot);
     this.robot.position.y = 25;
     this.add(this.robot);
+    //this.ground.updatePhysicPosition();
     this.add(this.ground);
     this.add(this.ovobu);
     this.add(this.ovoma);
