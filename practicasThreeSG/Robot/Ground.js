@@ -29,10 +29,10 @@ class Ground extends PhysicObject {
 
     //this.raycaster = new THREE.Raycaster ();  // To select boxes
 
-      this.shape = new CANNON.Box(new CANNON.Vec3(this.width,2,this.deep));
+      this.shape = new CANNON.Box(new CANNON.Vec3(this.width/4,2,this.deep/6));
 
       this.ground = new PhysicMesh(
-      new THREE.BoxGeometry (this.width, 2, this.deep, 1, 1, 1),
+      new THREE.BoxGeometry (this.width/2, 2, this.deep/3, 1, 1, 1),
       this.material,
       this.shape,
           0

@@ -19,16 +19,20 @@ class TheScene extends WorldScene {
     this.ground = null;
     this.robot = null;
 
-    this.ovobu = null;
-    this.ovoma = null;
+    this.ovobu = [];
+    this.ovoma = [];
 
 
     this.createLights ();
     this.createCamera (renderer);
+
     this.axis = new THREE.AxisHelper (25);
     this.add (this.axis);
-    this.model = this.createModel ();
 
+    this.model = this.createModel ();
+    this.add (this.model);
+
+    this.generateSkyBox();
     /*
     this.ground.body.addEventListener("collide",function(e){
         console.log("The sphere just collided with the ground!");
@@ -36,7 +40,7 @@ class TheScene extends WorldScene {
         console.log("Contact between bodies:",e.contact);
     });*/
 
-    this.add (this.model);
+
   }
   
   /// It creates the camera and adds it to the graph
@@ -45,8 +49,8 @@ class TheScene extends WorldScene {
    */
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set (60, 30, 60);
-    var look = new THREE.Vector3 (0,20,0);
+    this.camera.position.set (0, 60, 60);
+    var look = new THREE.Vector3 (0,15,0);
     this.camera.lookAt(look);
 
     this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
@@ -61,15 +65,17 @@ class TheScene extends WorldScene {
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
-    this.ambientLight = new THREE.AmbientLight(0xccddee, 0.35);
+    this.ambientLight = new THREE.AmbientLight(0x404040);
     this.add (this.ambientLight);
-    
+
     // add spotlight for the shadows
     this.spotLight = new THREE.SpotLight( 0xffffff );
-    this.spotLight.position.set( 60, 60, 40 );
+    this.spotLight.position.set( 100, 1000, 100 );
     this.spotLight.castShadow = true;
+    this.spotLight.intensity = 2;
+    this.spotLight.distance = 2000;
     // the shadow resolution
-    this.spotLight.shadow.mapSize.width=2048
+    this.spotLight.shadow.mapSize.width=2048;
     this.spotLight.shadow.mapSize.height=2048;
     this.add (this.spotLight);
   }
@@ -81,31 +87,22 @@ class TheScene extends WorldScene {
   createModel () {
     var model = new THREE.Object3D();
     var loader = new THREE.TextureLoader();
-    var textura = loader.load ("imgs/wood.jpg");
-    this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial ({map: textura}), 4);
+    var textura = loader.load ("imgs/ground.jpg");
+      textura.wrapS = THREE.RepeatWrapping;
+      textura.wrapT = THREE.RepeatWrapping;
+      textura.repeat.set( 2, 1 );
 
-    this.robot = new Robot();
+      this.ground = new Ground (300, 300, new THREE.MeshStandardMaterial({map: textura}), 4);
 
-      this.ovobu = new OvoBu();
-      this.ovoma = new OvoMa();
-
-
-      this.ovobu.position.x = 10;
-      this.ovoma.position.z = 10;
-
-      this.ovobu.position.y = 25;
-      this.ovoma.position.y = 25;
-
+      this.robot = new Robot();
     //  model.add (this.ground);
     //model.add(this.robot);
-    this.robot.position.y = 25;
+    this.robot.position.y = 10;
+    this.robot.rotation.y = 1.57;
     this.add(this.robot);
-    //this.ground.updatePhysicPosition();
     this.add(this.ground);
-    this.add(this.ovobu);
-    this.add(this.ovoma);
-    //model.add(this.ovobu);
-    //model.add(this.ovoma);
+    this.generateOvo(2);
+
     return model;
   }
   // Public methods
@@ -135,7 +132,6 @@ class TheScene extends WorldScene {
    */
   animate (controls) {
     this.axis.visible = controls.axis;
-    this.spotLight.intensity = (controls.turnLight === true ? controls.lightIntensity : 0);
     this.robot.setHeight(controls.height);
     this.robot.setHeadRotation(controls.rotation);
     this.robot.setBodyRotation(controls.rotationBody);
@@ -166,6 +162,57 @@ class TheScene extends WorldScene {
   setCameraAspect (anAspectRatio) {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
+  }
+
+  generateOvoBu(x,y,z){
+      var ovobu = new OvoBu();
+
+
+      ovobu.position.x = x;
+        ovobu.position.y = y;
+      ovobu.position.z = z;
+      this.add(ovobu);
+
+
+  }
+  generateOvoMa(x,y,z){
+      var ovoma = new OvoMa();
+      ovoma.position.x = x;
+      ovoma.position.y = y;
+      ovoma.position.z = z;
+
+      ovoma.body.addEventListener("collide",function (e) {
+          console.log("golpe");
+          e.position.x = x;
+          e.position.y = y;
+          e.position.z = z;
+      });
+      this.ovoma.push(ovoma);
+      this.add(ovoma);
+  }
+
+  generateOvo(n){
+      for(var i=0;i<n;i++){
+          this.generateOvoBu(-100,5,i+1*2);
+          this.generateOvoMa(100,5,i+1*-2);
+      }
+  }
+
+  generateSkyBox(){
+      var materialArray = [];
+      var loader = new THREE.TextureLoader();
+      var textura = loader.load ("imgs/sky.png");
+      for(var i=0;i<7;i++){
+          materialArray.push(new THREE.MeshStandardMaterial({map: textura}));
+          materialArray[i].side = THREE.BackSide;
+
+      }
+      var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
+      var skyboxGeom = new THREE.CubeGeometry( 500, 500, 500, 1, 1, 1 );
+      var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+      this.add( skybox );
+
+
   }
 
 }

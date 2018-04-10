@@ -7,9 +7,13 @@ class Ovolador extends PhysicObject{
         this.material = null;
 
         this.castShadow = true;
+        this.receiveShadow = true;
 
         //this.model = this.createModel();
         this.add(this.createModel());
+
+        this.body.type = CANNON.Body.KINEMATIC;
+
     }
     createModel(){
     }
@@ -32,6 +36,8 @@ class OvoBu extends Ovolador {
             new THREE.SphereGeometry( this.size, 16, 16 ),
             this.material
         );
+        this.body.velocity = new CANNON.Vec3(50,0,0);
+
         //this.model.position.y = this.size;
         this.updatePhysicPosition();
         return this.model;
@@ -46,16 +52,17 @@ class OvoMa extends Ovolador{
     }
 
     createModel(){
-        this.size = 2;
+        this.size = 5;
+        var width = 0.3;
 
         //this.body.quaternion.setFromEuler(0,0,0);
 
         this.material = new THREE.MeshPhongMaterial({color: 0xff0000 , specular: 0x000000});
         this.model = new PhysicMesh(
-            new THREE.CylinderGeometry(2,2,this.size,16,1,false),
+            new THREE.CylinderGeometry(width,width,this.size,16,1,false),
             this.material,
-            new CANNON.Cylinder(2,2,this.size,16),
-            10
+            new CANNON.Cylinder(width,width,this.size,16),
+            1
         );
 
 
@@ -66,9 +73,11 @@ class OvoMa extends Ovolador{
         this.rotation.y = 1.57;
         //this.model.position.y = 1;
         this.model.rotation.x = 1.57;
-
         this.body = this.model.body;
+        this.body.inertia = new CANNON.Vec3(3,0,0);
+        this.body.velocity = new CANNON.Vec3(-50,0,0);
 
+        //this.body.angularVelocity = new CANNON.Vec3(0,0,0);
         //this.model.position.y = this.size/2;
         //this.model.rotation.x = 1.57;
         //this.model.updatePhysicPosition();

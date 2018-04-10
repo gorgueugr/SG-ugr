@@ -35,9 +35,9 @@ class Robot extends PhysicObject {
         this.add(this.model);
 
         var bbox = new THREE.Box3().setFromObject(this.model);
-        var a = bbox.getSize()
+        var a = bbox.getSize();
         //var abox = new THREE.Vector3(bbox.min);
-        console.log(a);
+        //console.log(a);
 
         this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
 

@@ -47,6 +47,7 @@ class WorldScene extends THREE.Scene{
 
         for(var i=0;i<this.physicsObjects.length;i++){
             this.physicsObjects[i].position.copy(this.physicsObjects[i].body.position);
+            this.physicsObjects[i].quaternion.copy(this.physicsObjects[i].body.quaternion);
         }
     }
 }

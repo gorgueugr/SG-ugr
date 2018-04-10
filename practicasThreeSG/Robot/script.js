@@ -96,7 +96,7 @@ function setMessage (str) {
 function onMouseDown (event) {
   if (event.ctrlKey) {
     // The Trackballcontrol only works if Ctrl key is pressed
-    scene.getCameraControls().enabled = true;
+    //scene.getCameraControls().enabled = true;
   } else {  
     scene.getCameraControls().enabled = false;
     if (event.button === 0) {   // Left button
@@ -165,7 +165,7 @@ function onMouseUp (event) {
 function onMouseWheel (event) {
   if (event.ctrlKey) {
     // The Trackballcontrol only works if Ctrl key is pressed
-    scene.getCameraControls().enabled = true;
+    //scene.getCameraControls().enabled = true;
   } else {  
     scene.getCameraControls().enabled = false;
     if (mouseDown) {
