@@ -22,6 +22,9 @@ class TheScene extends WorldScene {
     this.ovobu = [];
     this.ovoma = [];
 
+    this.robotZ = 0;
+    this.robotX = 0;
+
 
     this.createLights ();
     this.createCamera (renderer);
@@ -33,12 +36,6 @@ class TheScene extends WorldScene {
     this.add (this.model);
 
     this.generateSkyBox();
-    /*
-    this.ground.body.addEventListener("collide",function(e){
-        console.log("The sphere just collided with the ground!");
-        console.log("Collided with body:",e.body);
-        console.log("Contact between bodies:",e.contact);
-    });*/
 
 
   }
@@ -101,30 +98,11 @@ class TheScene extends WorldScene {
     this.robot.rotation.y = 1.57;
     this.add(this.robot);
     this.add(this.ground);
-    this.generateOvo(2);
+    this.generateOvo(7);
 
     return model;
   }
   // Public methods
-
-  /// It adds a new box, or finish the action
-  /**
-   * @param event - Mouse information
-   * @param action - Which action is requested to be processed: start adding or finish.
-   */
-  addBox (event, action) {
-    this.ground.addBox(event, action);
-  }
-  
-  /// It moves or rotates a box on the ground
-  /**
-   * @param event - Mouse information
-   * @param action - Which action is requested to be processed: select a box, move it, rotate it or finish the action.
-   */
-  moveBox (event, action) {
-    this.ground.moveBox (event, action);
-  }
-  
 
   /// It sets the crane position according to the GUI
   /**
@@ -135,8 +113,12 @@ class TheScene extends WorldScene {
     this.robot.setHeight(controls.height);
     this.robot.setHeadRotation(controls.rotation);
     this.robot.setBodyRotation(controls.rotationBody);
+  }
 
-      //this.spotLight.intensity = controls.lightIntensity ;
+  updateRobotPosition(){
+      this.robot.position.z = this.robotZ;
+      this.robot.position.x = this.robotX;
+      console.log(  this.robot.position.z,  this.robot.position.x);
   }
   
   /// It returns the camera
@@ -169,11 +151,9 @@ class TheScene extends WorldScene {
 
 
       ovobu.position.x = x;
-        ovobu.position.y = y;
+      ovobu.position.y = y;
       ovobu.position.z = z;
       this.add(ovobu);
-
-
   }
   generateOvoMa(x,y,z){
       var ovoma = new OvoMa();
@@ -181,12 +161,6 @@ class TheScene extends WorldScene {
       ovoma.position.y = y;
       ovoma.position.z = z;
 
-      ovoma.body.addEventListener("collide",function (e) {
-          console.log("golpe");
-          e.position.x = x;
-          e.position.y = y;
-          e.position.z = z;
-      });
       this.ovoma.push(ovoma);
       this.add(ovoma);
   }
@@ -211,6 +185,30 @@ class TheScene extends WorldScene {
       var skyboxGeom = new THREE.CubeGeometry( 500, 500, 500, 1, 1, 1 );
       var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
       this.add( skybox );
+
+
+  }
+
+  robotToLeft(){
+      this.robot.position.z = this.robot.position.z - 3;
+      this.robot.updatePhysicPosition();
+
+  }
+
+  robotToRight(){
+      this.robot.position.z = this.robot.position.z + 3;
+      this.robot.updatePhysicPosition();
+
+  }
+
+  robotToFront(){
+      this.robot.position.x = this.robot.position.x + 3;
+      this.robot.updatePhysicPosition();
+
+  }
+  robotToBack(){
+      this.robot.position.x = this.robot.position.x - 3;
+      this.robot.updatePhysicPosition();
 
 
   }

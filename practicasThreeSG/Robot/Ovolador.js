@@ -9,14 +9,26 @@ class Ovolador extends PhysicObject{
         this.castShadow = true;
         this.receiveShadow = true;
 
+        this.vx = 0;
+        this.vy = 0;
+        this.vz = 0;
+        this.applyVelocity();
+
         //this.model = this.createModel();
         this.add(this.createModel());
 
         this.body.type = CANNON.Body.KINEMATIC;
 
+        this.body.addEventListener("collide",function (e) {
+            console.log("golpe");
+        });
+
     }
     createModel(){
     }
+    applyVelocity(){
+    }
+
 }
 
 
@@ -36,12 +48,19 @@ class OvoBu extends Ovolador {
             new THREE.SphereGeometry( this.size, 16, 16 ),
             this.material
         );
-        this.body.velocity = new CANNON.Vec3(50,0,0);
+
+
+        this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
         //this.model.position.y = this.size;
         this.updatePhysicPosition();
         return this.model;
     };
+    applyVelocity(){
+        this.vx=  Math.random() * 50 + 25;
+        this.vy =  Math.random() * 5 + 1;
+        this.vz =  Math.random() * 5 + 1;
+    }
 }
 
 
@@ -74,8 +93,8 @@ class OvoMa extends Ovolador{
         //this.model.position.y = 1;
         this.model.rotation.x = 1.57;
         this.body = this.model.body;
-        this.body.inertia = new CANNON.Vec3(3,0,0);
-        this.body.velocity = new CANNON.Vec3(-50,0,0);
+
+        this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
         //this.body.angularVelocity = new CANNON.Vec3(0,0,0);
         //this.model.position.y = this.size/2;
@@ -84,4 +103,10 @@ class OvoMa extends Ovolador{
         //this.updatePhysicPosition();
         return this.model;
     };
+
+    applyVelocity(){
+        this.vx=  Math.random() * -50 - 25;
+        this.vy =  Math.random() * 5 - 1;
+        this.vz =  Math.random() * 5 - 1;
+    }
 }

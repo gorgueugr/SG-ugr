@@ -178,6 +178,27 @@ function onMouseWheel (event) {
   }
 }
 
+function onKeyPress(event) {
+    var keyCode = event.key;
+    keyCode = keyCode.toLowerCase();
+    console.log(keyCode);
+    switch (keyCode) {
+        case "a": //A
+            scene.robotToLeft();
+          break;
+        case "d": //D
+            scene.robotToRight();
+            break;
+        case "w": //W
+            scene.robotToFront();
+          break;
+        case "s": //D
+            scene.robotToBack();
+          break;
+    }
+}
+
+
 /// It processes the window size changes
 function onWindowResize () {
   scene.setCameraAspect (window.innerWidth / window.innerHeight);
@@ -225,8 +246,11 @@ $(function () {
   window.addEventListener ("mouseup", onMouseUp, true);
   window.addEventListener ("mousewheel", onMouseWheel, true);   // For Chrome an others
   window.addEventListener ("DOMMouseScroll", onMouseWheel, true); // For Firefox
-  
-  // create a scene, that will hold all our elements such as objects, cameras and lights.
+    window.addEventListener ("keypress", onKeyPress, true);
+
+
+
+    // create a scene, that will hold all our elements such as objects, cameras and lights.
   scene = new TheScene (renderer.domElement);
   cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, scene.world );
 
