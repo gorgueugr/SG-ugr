@@ -192,8 +192,8 @@ class Robot extends PhysicObject {
         console.log("jump");
         var position = { y: 0.0 };
         var target = { y: 2.0 };
-        var tween = new TWEEN.Tween(position).to(target, 350);
-        var tweenB =  new TWEEN.Tween(target).to(position, 350);
+        var tween = new TWEEN.Tween(position).to(target, 250);
+        var tweenB =  new TWEEN.Tween(target).to(position, 250);
         var that = this;
         tween.onUpdate(function(){
             that.setHeight(position.y);
