@@ -6,29 +6,28 @@ class Ovolador extends PhysicObject{
         this.color = null;
         this.material = null;
 
-        this.castShadow = true;
-        this.receiveShadow = true;
-
         this.vx = 0;
         this.vy = 0;
         this.vz = 0;
+
+        this.initPosition = new THREE.Vector3();
+
+        this.castShadow = true;
+        this.receiveShadow = true;
+
+        this.add(this.createModel());
         this.applyVelocity();
 
-        //this.model = this.createModel();
-        this.add(this.createModel());
-
         this.body.type = CANNON.Body.KINEMATIC;
+        this.body.collisionResponse = false;
 
-        this.body.addEventListener("collide",function (e) {
-            console.log("golpe");
-        });
+
 
     }
     createModel(){
     }
     applyVelocity(){
     }
-
 }
 
 
@@ -52,14 +51,13 @@ class OvoBu extends Ovolador {
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
-        //this.model.position.y = this.size;
-        this.updatePhysicPosition();
         return this.model;
     };
     applyVelocity(){
-        this.vx=  Math.random() * 50 + 25;
-        this.vy =  Math.random() * 5 + 1;
-        this.vz =  Math.random() * 5 + 1;
+        this.vx =  Math.random() * 25 + 1;
+        this.vy = 0;
+        this.vz =  Math.random() * 5 - 1;
+        this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
     }
 }
 
@@ -96,17 +94,15 @@ class OvoMa extends Ovolador{
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
-        //this.body.angularVelocity = new CANNON.Vec3(0,0,0);
-        //this.model.position.y = this.size/2;
-        //this.model.rotation.x = 1.57;
-        //this.model.updatePhysicPosition();
-        //this.updatePhysicPosition();
         return this.model;
     };
 
     applyVelocity(){
-        this.vx=  Math.random() * -50 - 25;
-        this.vy =  Math.random() * 5 - 1;
-        this.vz =  Math.random() * 5 - 1;
+        this.vx=  Math.random() * -25 - 1;
+        this.vy = 0;
+        this.vz =  Math.random() * 5 - 2.5;
+        this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
+
     }
+
 }

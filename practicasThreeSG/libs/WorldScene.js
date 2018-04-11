@@ -50,6 +50,14 @@ class WorldScene extends THREE.Scene{
             this.physicsObjects[i].quaternion.copy(this.physicsObjects[i].body.quaternion);
         }
     }
+
+    getObjectFromBody(body){
+        for(var i=0;i<this.physicsObjects.length;i++){
+            if(this.physicsObjects[i].body == body)
+                return this.physicsObjects[i];
+        }
+        return null;
+    }
 }
 
 class PhysicObject extends THREE.Object3D{
@@ -71,7 +79,7 @@ class PhysicObject extends THREE.Object3D{
 class PhysicMesh extends THREE.Mesh{
     constructor(geometry,material,shape,mass){
         super(geometry,material);
-        this.shape = shape || null;
+        this.shape = (shape != null) ?  shape : null;
         this.body = null;
         this.isPhysicMesh = true;
         if(this.shape != null){
@@ -81,9 +89,7 @@ class PhysicMesh extends THREE.Mesh{
         //this.updatePhysicPosition();
     }
     updatePhysicPosition(){
-
         if(this.body != null) {
-
             this.body.position.set(this.position.x, this.position.y, this.position.z);
             this.body.quaternion.set(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
         }

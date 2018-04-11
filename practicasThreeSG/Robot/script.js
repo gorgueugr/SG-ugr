@@ -179,6 +179,9 @@ function onMouseWheel (event) {
 }
 
 function onKeyPress(event) {
+    if(scene.isRobotFlying()){
+      return;
+    }
     var keyCode = event.key;
     keyCode = keyCode.toLowerCase();
     console.log(keyCode);
@@ -225,7 +228,7 @@ function render() {
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
   scene.updatePhysics();
-  cannonDebugRenderer.update();      // Update the debug renderer
+  //cannonDebugRenderer.update();      // Update the debug renderer
 
   renderer.render(scene, scene.getCamera());
 }

@@ -40,6 +40,7 @@ class Ground extends PhysicObject {
 
     this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,1,0));
     this.ground.receiveShadow = true;
+
     this.ground.autoUpdateMatrix = false;
     this.add (this.ground);
 

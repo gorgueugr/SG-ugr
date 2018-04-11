@@ -19,12 +19,8 @@ class TheScene extends WorldScene {
     this.ground = null;
     this.robot = null;
 
-    this.ovobu = [];
-    this.ovoma = [];
-
-    this.robotZ = 0;
-    this.robotX = 0;
-
+    this.walll = null;
+    this.wallr = null;
 
     this.createLights ();
     this.createCamera (renderer);
@@ -46,7 +42,7 @@ class TheScene extends WorldScene {
    */
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set (0, 60, 60);
+    this.camera.position.set (80,75,0);
     var look = new THREE.Vector3 (0,15,0);
     this.camera.lookAt(look);
 
@@ -65,15 +61,17 @@ class TheScene extends WorldScene {
     this.ambientLight = new THREE.AmbientLight(0x404040);
     this.add (this.ambientLight);
 
+    var skyLight = new THREE.HemisphereLight(0xffffff,0x777777,0.5);
+    this.add(skyLight);
     // add spotlight for the shadows
     this.spotLight = new THREE.SpotLight( 0xffffff );
-    this.spotLight.position.set( 100, 1000, 100 );
+    this.spotLight.position.set( 100, 100, 100 );
     this.spotLight.castShadow = true;
     this.spotLight.intensity = 2;
-    this.spotLight.distance = 2000;
+    this.spotLight.distance = 200;
     // the shadow resolution
-    this.spotLight.shadow.mapSize.width=2048;
-    this.spotLight.shadow.mapSize.height=2048;
+    //this.spotLight.shadow.mapSize.width=2048;
+    //this.spotLight.shadow.mapSize.height=2048;
     this.add (this.spotLight);
   }
   
@@ -89,16 +87,84 @@ class TheScene extends WorldScene {
       textura.wrapT = THREE.RepeatWrapping;
       textura.repeat.set( 2, 1 );
 
+      var wallGeometry = new THREE.BoxGeometry(1,150,150);
+      var wallMaterial = new THREE.MeshStandardMaterial();
+      var wallPhysic = new CANNON.Box(new CANNON.Vec3(1,150,150));
+      var wallMass = 0;
+
+      this.walll = new PhysicMesh(
+          wallGeometry,
+          wallMaterial,
+          wallPhysic,
+          wallMass
+      );
+
+      this.wallr = new PhysicMesh(
+          wallGeometry,
+          wallMaterial,
+          wallPhysic,
+          wallMass
+      );
+
+
+      this.walll.body.type = CANNON.Body.DYNAMIC;
+      this.wallr.body.type = CANNON.Body.DYNAMIC;
+
+      this.walll.position.x = -90;
+      this.walll.visible = false;
+      this.wallr.position.x = 90;
+      this.wallr.visible = false;
+
+      this.add(this.walll);
+      this.add(this.wallr);
+
+
       this.ground = new Ground (300, 300, new THREE.MeshStandardMaterial({map: textura}), 4);
 
       this.robot = new Robot();
-    //  model.add (this.ground);
-    //model.add(this.robot);
     this.robot.position.y = 10;
     this.robot.rotation.y = 1.57;
     this.add(this.robot);
     this.add(this.ground);
     this.generateOvo(7);
+
+
+      var that = this;
+
+
+      this.wallr.body.addEventListener("collide",function (e) {
+          var body = e.body;
+          var o = that.getObjectFromBody(body);
+          if(o instanceof Ovolador){
+              console.log("Wallr choca con " + o.constructor.name);
+              o.position.copy(o.initPosition);
+              o.applyVelocity();
+              o.updatePhysicPosition();
+          }
+      });
+
+      this.walll.body.addEventListener("collide",function (e) {
+          var body = e.body;
+          var o = that.getObjectFromBody(body);
+          if(o instanceof Ovolador){
+              console.log("Walll choca con " + o.constructor.name);
+              o.position.copy(o.initPosition);
+              o.applyVelocity();
+              o.updatePhysicPosition();
+          }
+      });
+
+      this.robot.body.addEventListener("collide",function (e) {
+          var body = e.body;
+
+          var o = that.getObjectFromBody(body);
+          if(o instanceof Ovolador){
+              console.log("Robot choca con " + o.constructor.name);
+              o.position.copy(o.initPosition);
+              o.applyVelocity();
+              o.updatePhysicPosition();
+          }
+      });
 
     return model;
   }
@@ -148,27 +214,27 @@ class TheScene extends WorldScene {
 
   generateOvoBu(x,y,z){
       var ovobu = new OvoBu();
+      var xyz = new THREE.Vector3(x,y,z);
 
+      ovobu.position.copy(xyz);
+      ovobu.initPosition.copy(xyz);
 
-      ovobu.position.x = x;
-      ovobu.position.y = y;
-      ovobu.position.z = z;
       this.add(ovobu);
   }
   generateOvoMa(x,y,z){
       var ovoma = new OvoMa();
-      ovoma.position.x = x;
-      ovoma.position.y = y;
-      ovoma.position.z = z;
+      var xyz = new THREE.Vector3(x,y,z);
 
-      this.ovoma.push(ovoma);
+      ovoma.position.copy(xyz);
+      ovoma.initPosition.copy(xyz);
+
       this.add(ovoma);
   }
 
   generateOvo(n){
       for(var i=0;i<n;i++){
-          this.generateOvoBu(-100,5,i+1*2);
-          this.generateOvoMa(100,5,i+1*-2);
+          this.generateOvoBu(-75,3,i*3);
+          this.generateOvoMa(75,3,i*3);
       }
   }
 
@@ -212,6 +278,10 @@ class TheScene extends WorldScene {
 
 
   }
+
+    isRobotFlying(){
+      return this.robot.position.y == 0;
+    }
 
 }
 

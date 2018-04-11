@@ -30,6 +30,7 @@ class Robot extends PhysicObject {
         this.body = new CANNON.Body({mass:10});
 
         this.castShadow = true;
+        this.receiveShadow = true;
 
         this.model = this.createModel();
         this.add(this.model);
@@ -39,6 +40,7 @@ class Robot extends PhysicObject {
         //var abox = new THREE.Vector3(bbox.min);
         //console.log(a);
 
+        //this.shape = new CANNON.Sphere(5);
         this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
 
 
@@ -174,5 +176,6 @@ class Robot extends PhysicObject {
         if(angle>=-0.75 && angle<=0.5)
             this.bodyRobot.rotation.x = angle;
     }
+
 
 }
