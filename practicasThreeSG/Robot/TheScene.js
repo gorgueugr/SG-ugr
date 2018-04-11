@@ -31,6 +31,9 @@ class TheScene extends WorldScene {
     this.model = this.createModel ();
     this.add (this.model);
 
+    this.model.castShadow = true;
+    this.model.receiveShadow = true;
+
     this.generateSkyBox();
 
 
@@ -58,21 +61,25 @@ class TheScene extends WorldScene {
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
-      var ambient = new THREE.AmbientLight( 0xffffff, 0.7 );
+      var ambient = new THREE.AmbientLight( 0xffffff, 0.3 );
       this.add(ambient);
 
-      var spotLight = new THREE.SpotLight( 0xffffff, 1 );
-      spotLight.position.set( 50, 100, 0 );
+     // var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+     // directionalLight.castShadow = true;
+      //this.add(directionalLight);
+
+
+      var spotLight = new THREE.SpotLight( 0xffffff, 0.3 );
+      spotLight.position.set( -50, 100, 0 );
       spotLight.angle = Math.PI / 4;
       spotLight.penumbra = 0.05;
       spotLight.decay = 2;
-      spotLight.distance = 200;
+      spotLight.distance = 500;
       spotLight.castShadow = true;
-      spotLight.shadow.mapSize.width = 1024;
-      spotLight.shadow.mapSize.height = 1024;
-      spotLight.shadow.camera.near = 2000;
-      spotLight.shadow.camera.far = 5000;
-
+      spotLight.shadow.mapSize.width = 512;
+      spotLight.shadow.mapSize.height = 512;
+      spotLight.shadow.camera.near = 1;
+      spotLight.shadow.camera.far = 1;
       this.add( spotLight );
 
   }
@@ -97,7 +104,6 @@ class TheScene extends WorldScene {
       var wallGeometry = new THREE.BoxGeometry(1,45,150);
       var wallMaterial = new THREE.MeshPhongMaterial({map:nave});
       var wallPhysic = new CANNON.Box(new CANNON.Vec3(0.1,1000,1000));
-      //var wallPhysic = new CANNON.Plane();
 
       var wallMass = 0;
       this.walll = new PhysicMesh(
@@ -130,6 +136,8 @@ class TheScene extends WorldScene {
 
 
       this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial({map: textura}), 4);
+      //this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial(), 4);
+      //this.ground.ground.receiveShadow = true;
 
 
       var meta = new PhysicMesh(
@@ -147,7 +155,7 @@ class TheScene extends WorldScene {
 
 
       this.robot = new Robot();
-    this.robot.position.y = 5;
+    this.robot.position.y = 15;
     this.robot.rotation.y = 1.57;
     this.add(meta);
     this.add(this.robot);

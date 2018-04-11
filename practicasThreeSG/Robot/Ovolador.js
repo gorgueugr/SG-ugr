@@ -90,6 +90,8 @@ class OvoMa extends Ovolador{
         );
 
 
+
+
         //Mover o rotar el model para ajustar con la fisica,
         //Para posicionar le objeto tocar this.
 
@@ -100,6 +102,12 @@ class OvoMa extends Ovolador{
         this.body = this.model.body;
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
+
+
+        //var light = new THREE.PointLight(0x0000ff,0.1,5);
+        //this.add(light);
+
+
 
         return this.model;
     };

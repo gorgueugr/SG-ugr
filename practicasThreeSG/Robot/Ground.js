@@ -20,8 +20,6 @@ class Ground extends PhysicObject {
 
     this.ground = null;
 
-    //this.raycaster = new THREE.Raycaster ();  // To select boxes
-
       this.shape = new CANNON.Box(new CANNON.Vec3(this.width/4,2,this.deep/6));
 
       this.ground = new PhysicMesh(
@@ -33,9 +31,7 @@ class Ground extends PhysicObject {
 
     this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,1,0));
     this.ground.castShadow = true;
-      this.ground.receiveShadow = true;
-      this.castShadow = true;
-      this.receiveShadow = true;
+    this.ground.receiveShadow = true;
 
     this.ground.autoUpdateMatrix = false;
     this.add (this.ground);
@@ -43,7 +39,6 @@ class Ground extends PhysicObject {
 
     this.body = new CANNON.Body({mass:0});
     this.body.addShape(this.ground.shape);
-
     this.position.y = -2;
 
 
