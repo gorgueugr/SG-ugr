@@ -44,10 +44,8 @@ class WorldScene extends THREE.Scene{
 
     updatePhysics(){
         this.world.step(1/60);
-
         for(var i=0;i<this.physicsObjects.length;i++){
-            this.physicsObjects[i].position.copy(this.physicsObjects[i].body.position);
-            this.physicsObjects[i].quaternion.copy(this.physicsObjects[i].body.quaternion);
+            this.physicsObjects[i].updateViewPosition();
         }
     }
 
@@ -68,11 +66,16 @@ class PhysicObject extends THREE.Object3D{
         this.isPhysicObject = true;
         this.updatePhysicPosition();
     }
-
     updatePhysicPosition(){
         if(this.body != null) {
             this.body.position.set(this.position.x, this.position.y, this.position.z);
             this.body.quaternion.set(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
+        }
+    }
+    updateViewPosition(){
+        if(this.body != null) {
+            this.position.copy(this.body.position);
+            this.quaternion.copy(this.body.quaternion);
         }
     }
 }
@@ -92,6 +95,12 @@ class PhysicMesh extends THREE.Mesh{
         if(this.body != null) {
             this.body.position.set(this.position.x, this.position.y, this.position.z);
             this.body.quaternion.set(this.quaternion.x, this.quaternion.y, this.quaternion.z, this.quaternion.w);
+        }
+    }
+    updateViewPosition(){
+        if(this.body != null) {
+            this.position.copy(this.body.position);
+            this.quaternion.copy(this.body.quaternion);
         }
     }
 }

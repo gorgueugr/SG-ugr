@@ -25,8 +25,8 @@ class TheScene extends WorldScene {
     this.createLights ();
     this.createCamera (renderer);
 
-    this.axis = new THREE.AxisHelper (25);
-    this.add (this.axis);
+    //this.axis = new THREE.AxisHelper (25);
+    //this.add (this.axis);
 
     this.model = this.createModel ();
     this.add (this.model);
@@ -42,8 +42,8 @@ class TheScene extends WorldScene {
    */
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.camera.position.set (80,75,0);
-    var look = new THREE.Vector3 (0,15,0);
+    this.camera.position.set (-150,120,0);
+    var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
 
     this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
@@ -58,21 +58,23 @@ class TheScene extends WorldScene {
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
-    this.ambientLight = new THREE.AmbientLight(0x404040);
-    this.add (this.ambientLight);
+      var ambient = new THREE.AmbientLight( 0xffffff, 0.7 );
+      this.add(ambient);
 
-    var skyLight = new THREE.HemisphereLight(0xffffff,0x777777,0.5);
-    this.add(skyLight);
-    // add spotlight for the shadows
-    this.spotLight = new THREE.SpotLight( 0xffffff );
-    this.spotLight.position.set( 100, 100, 100 );
-    this.spotLight.castShadow = true;
-    this.spotLight.intensity = 2;
-    this.spotLight.distance = 200;
-    // the shadow resolution
-    //this.spotLight.shadow.mapSize.width=2048;
-    //this.spotLight.shadow.mapSize.height=2048;
-    this.add (this.spotLight);
+      var spotLight = new THREE.SpotLight( 0xffffff, 1 );
+      spotLight.position.set( 50, 100, 0 );
+      spotLight.angle = Math.PI / 4;
+      spotLight.penumbra = 0.05;
+      spotLight.decay = 2;
+      spotLight.distance = 200;
+      spotLight.castShadow = true;
+      spotLight.shadow.mapSize.width = 1024;
+      spotLight.shadow.mapSize.height = 1024;
+      spotLight.shadow.camera.near = 2000;
+      spotLight.shadow.camera.far = 5000;
+
+      this.add( spotLight );
+
   }
   
   /// It creates the geometric model: crane and ground
@@ -85,16 +87,22 @@ class TheScene extends WorldScene {
     var textura = loader.load ("imgs/ground.jpg");
       textura.wrapS = THREE.RepeatWrapping;
       textura.wrapT = THREE.RepeatWrapping;
-      textura.repeat.set( 2, 1 );
+      textura.repeat.set( 4, 2 );
 
-      var wallGeometry = new THREE.BoxGeometry(1,150,150);
-      var wallMaterial = new THREE.MeshStandardMaterial();
-      var wallPhysic = new CANNON.Box(new CANNON.Vec3(1,150,150));
+      var nave = loader.load("imgs/nave.png");
+      nave.wrapS = THREE.RepeatWrapping;
+      nave.wrapT = THREE.RepeatWrapping;
+      nave.repeat.set( 4, 1 );
+
+      var wallGeometry = new THREE.BoxGeometry(1,45,150);
+      var wallMaterial = new THREE.MeshPhongMaterial({map:nave});
+      var wallPhysic = new CANNON.Box(new CANNON.Vec3(0.1,1000,1000));
+      //var wallPhysic = new CANNON.Plane();
+
       var wallMass = 0;
-
       this.walll = new PhysicMesh(
           wallGeometry,
-          wallMaterial,
+          new THREE.MeshStandardMaterial(),
           wallPhysic,
           wallMass
       );
@@ -106,51 +114,74 @@ class TheScene extends WorldScene {
           wallMass
       );
 
-
+      //ESto se hace debido a que cannon no detecta colisiones entre
+      // Kinematics bodys y al generar un body con masa 0 le atribuye kinematic por defecto
       this.walll.body.type = CANNON.Body.DYNAMIC;
       this.wallr.body.type = CANNON.Body.DYNAMIC;
 
       this.walll.position.x = -90;
       this.walll.visible = false;
-      this.wallr.position.x = 90;
-      this.wallr.visible = false;
+      this.wallr.position.x = 200;
+      this.wallr.visible = true;
+
 
       this.add(this.walll);
       this.add(this.wallr);
 
 
-      this.ground = new Ground (300, 300, new THREE.MeshStandardMaterial({map: textura}), 4);
+      this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial({map: textura}), 4);
+
+
+      var meta = new PhysicMesh(
+          new THREE.BoxGeometry(10,1,75),
+          new THREE.MeshStandardMaterial({color: 0xff0000}),
+          new CANNON.Box(new CANNON.Vec3(5,1,75)),
+          0
+      );
+
+        meta.body.type = CANNON.Body.DYNAMIC;
+
+        meta.position.x = 80;
+        meta.position.y = -0.5;
+
+
 
       this.robot = new Robot();
-    this.robot.position.y = 10;
+    this.robot.position.y = 5;
     this.robot.rotation.y = 1.57;
+    this.add(meta);
     this.add(this.robot);
     this.add(this.ground);
-    this.generateOvo(7);
+    this.generateOvo(50);
 
 
       var that = this;
 
+      meta.body.addEventListener("collide",function (e) {
+          var body = e.body;
+          var o = that.getObjectFromBody(body);
+          console.log("meta");
+          if(o instanceof Robot){
+              o.position.copy(new THREE.Vector3(0,5,0));
+              o.updatePhysicPosition();
+          }
+      });
 
       this.wallr.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          if(o instanceof Ovolador){
-              console.log("Wallr choca con " + o.constructor.name);
-              o.position.copy(o.initPosition);
-              o.applyVelocity();
-              o.updatePhysicPosition();
+          if(o instanceof OvoBu){
+              //console.log("Wallr choca con " + o.constructor.name);
+              o.reset();
           }
       });
 
       this.walll.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          if(o instanceof Ovolador){
-              console.log("Walll choca con " + o.constructor.name);
-              o.position.copy(o.initPosition);
-              o.applyVelocity();
-              o.updatePhysicPosition();
+          if(o instanceof OvoMa){
+              //console.log("Walll choca con " + o.constructor.name);
+              o.reset();
           }
       });
 
@@ -159,10 +190,12 @@ class TheScene extends WorldScene {
 
           var o = that.getObjectFromBody(body);
           if(o instanceof Ovolador){
-              console.log("Robot choca con " + o.constructor.name);
-              o.position.copy(o.initPosition);
-              o.applyVelocity();
-              o.updatePhysicPosition();
+              if(o instanceof OvoMa)
+                  that.robotToBack();
+              else
+                  that.robotToFront();
+              //console.log("Robot choca con " + o.constructor.name);
+              o.reset();
           }
       });
 
@@ -175,7 +208,6 @@ class TheScene extends WorldScene {
    * @controls - The GUI information
    */
   animate (controls) {
-    this.axis.visible = controls.axis;
     this.robot.setHeight(controls.height);
     this.robot.setHeadRotation(controls.rotation);
     this.robot.setBodyRotation(controls.rotationBody);
@@ -232,10 +264,11 @@ class TheScene extends WorldScene {
   }
 
   generateOvo(n){
-      for(var i=0;i<n;i++){
-          this.generateOvoBu(-75,3,i*3);
-          this.generateOvoMa(75,3,i*3);
-      }
+      for(var i=0;i<0.2*n;i++)
+          this.generateOvoBu(-150,3,(i*2) - 0.2*n/2);
+
+      for(var i=0;i<0.8*n;i++)
+          this.generateOvoMa(200,3,(i*2) - 0.8*n/2);
   }
 
   generateSkyBox(){
@@ -251,28 +284,34 @@ class TheScene extends WorldScene {
       var skyboxGeom = new THREE.CubeGeometry( 500, 500, 500, 1, 1, 1 );
       var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
       this.add( skybox );
-
-
   }
 
   robotToLeft(){
+
+      //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
       this.robot.position.z = this.robot.position.z - 3;
       this.robot.updatePhysicPosition();
 
   }
 
   robotToRight(){
+      //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,1.5),new CANNON.Vec3(0,0,0));
+
       this.robot.position.z = this.robot.position.z + 3;
       this.robot.updatePhysicPosition();
 
   }
 
   robotToFront(){
+      //this.robot.body.applyImpulse(new CANNON.Vec3(6,0,0),new CANNON.Vec3(0,0,0));
+
       this.robot.position.x = this.robot.position.x + 3;
       this.robot.updatePhysicPosition();
 
   }
   robotToBack(){
+      //this.robot.body.applyImpulse(new CANNON.Vec3(-2,0,0),new CANNON.Vec3(0,0,0));
+
       this.robot.position.x = this.robot.position.x - 3;
       this.robot.updatePhysicPosition();
 

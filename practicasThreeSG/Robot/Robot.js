@@ -27,7 +27,7 @@ class Robot extends PhysicObject {
         this.headMaterial = new THREE.MeshPhongMaterial( { map:  this.headTexture, specular: 0xffffff ,shininess: 15} );
         this.headTexture.wrapS = this.headTexture.wrapT = THREE.RepeatWrapping;
 
-        this.body = new CANNON.Body({mass:10});
+        this.body = new CANNON.Body({mass:1});
 
         this.castShadow = true;
         this.receiveShadow = true;
@@ -40,9 +40,8 @@ class Robot extends PhysicObject {
         //var abox = new THREE.Vector3(bbox.min);
         //console.log(a);
 
-        //this.shape = new CANNON.Sphere(5);
-        this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
-
+        this.shape = new CANNON.Sphere(a.y/2);
+         // this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
 
         //this.body.addShape(new CANNON.Sphere(2),new CANNON.Vec3(0,2.5,0),this.head.geometry.quaternion);
         //this.body.addShape(new CANNON.Cylinder(2,2,4,16),new CANNON.Vec3(0,2.5,0),this.bodyRobot.geometry.quaternion);
@@ -52,6 +51,16 @@ class Robot extends PhysicObject {
         this.updatePhysicPosition();
        // this.body.addShape(this.shape);
 
+        this.model.castShadow = true;
+        this.model.receiveShadow = true;
+
+    }
+    //Override
+    updateViewPosition(){
+        if(this.body != null) {
+            this.position.copy(this.body.position);
+            //this.quaternion.copy(this.body.quaternion);
+        }
     }
 
     createArm(){
@@ -118,6 +127,8 @@ class Robot extends PhysicObject {
             10
         );
 
+       // var light = new THREE.PointLight()
+
         eye.rotation.x = 1.57;
         eye.position.y = 1;
         eye.position.z = 1.6;
@@ -176,6 +187,8 @@ class Robot extends PhysicObject {
         if(angle>=-0.75 && angle<=0.5)
             this.bodyRobot.rotation.x = angle;
     }
+
+
 
 
 }

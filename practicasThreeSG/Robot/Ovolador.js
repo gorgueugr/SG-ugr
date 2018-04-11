@@ -12,21 +12,25 @@ class Ovolador extends PhysicObject{
 
         this.initPosition = new THREE.Vector3();
 
-        this.castShadow = true;
-        this.receiveShadow = true;
-
         this.add(this.createModel());
         this.applyVelocity();
 
+        this.model.castShadow = true;
+        //this.model.receiveShadow = true;
         this.body.type = CANNON.Body.KINEMATIC;
         this.body.collisionResponse = false;
 
 
 
     }
-    createModel(){
-    }
-    applyVelocity(){
+    createModel(){}
+    applyVelocity(){}
+    resetPosition(){}
+    reset(){
+        this.resetPosition();
+        //this.position.copy(this.initPosition);
+        this.applyVelocity();
+        this.updatePhysicPosition();
     }
 }
 
@@ -42,22 +46,25 @@ class OvoBu extends Ovolador {
         this.body = new CANNON.Body({mass:10});
         this.body.addShape(this.shape);
 
-        this.material = new THREE.MeshPhongMaterial({color: 0x33cc33 , specular: 0x000000});
+        this.material = new THREE.MeshPhongMaterial({color: 0x0000aa , specular: 0x404040});
         this.model = new THREE.Mesh(
             new THREE.SphereGeometry( this.size, 16, 16 ),
             this.material
         );
-
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
         return this.model;
     };
     applyVelocity(){
-        this.vx =  Math.random() * 25 + 1;
+        this.vx =  Math.random() * 50 + 1;
         this.vy = 0;
-        this.vz =  Math.random() * 5 - 1;
+        this.vz = 0;// Math.random() * 25 - 12;
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
+    }
+    resetPosition(){
+        //var xyz = new THREE.Vector3(75,3,0);
+        this.position.copy(this.initPosition);
     }
 }
 
@@ -98,11 +105,13 @@ class OvoMa extends Ovolador{
     };
 
     applyVelocity(){
-        this.vx=  Math.random() * -25 - 1;
+        this.vx=  Math.random() * -50 - 1;
         this.vy = 0;
-        this.vz =  Math.random() * 5 - 2.5;
+        this.vz =  0 ;//Math.random() * 25 - 12;
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
-
     }
-
+    resetPosition(){
+        //var xyz = new THREE.Vector3(-75,3,0);
+        this.position.copy(this.initPosition);
+    }
 }
