@@ -7,6 +7,9 @@ class Robot extends PhysicObject {
         this.height = null;
         this.arms = null;
 
+        this.light = null;
+        this.target = null;
+
         this.shoulders = [];
         this.legs = [];
 
@@ -34,6 +37,19 @@ class Robot extends PhysicObject {
 
         this.model = this.createModel();
         this.add(this.model);
+
+
+        this.target = new THREE.Object3D();
+        this.target.position.copy(new THREE.Vector3(0,0,10));
+        this.add(this.target);
+
+        this.light = new THREE.SpotLight(0xffffff,1);
+        this.light.position.copy(new THREE.Vector3(0,10,5));
+
+        this.light.target = this.target;
+        this.light.castShadow = true;
+        this.add(this.light);
+
 
         var bbox = new THREE.Box3().setFromObject(this.model);
         var a = bbox.getSize();
@@ -127,8 +143,6 @@ class Robot extends PhysicObject {
             10
         );
 
-       // var light = new THREE.PointLight()
-
         eye.rotation.x = 1.57;
         eye.position.y = 1;
         eye.position.z = 1.6;
@@ -161,6 +175,8 @@ class Robot extends PhysicObject {
         this.model.add(this.createArms());
         //this.body = this.head.body;
         this.model.position.y = -4.5;
+
+        //this.model.add(this.target);
 
         return this.model;
     }

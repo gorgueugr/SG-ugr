@@ -160,8 +160,17 @@ class TheScene extends WorldScene {
     this.add(meta);
     this.add(this.robot);
     this.add(this.ground);
+/*
+    var position = { y: 1 };
+      var target = { y: 5 };
+      var tweenOvo = new TWEEN.Tween(position).to(target, 300);
+      var that = this;
+      tweenOvo.onUpdate(function(){
+          that.generateOvo(position.y);
+      });
+      tweenOvo.start();
+      */
     this.generateOvo(50);
-
 
       var that = this;
 
@@ -274,11 +283,19 @@ class TheScene extends WorldScene {
   }
 
   generateOvo(n){
-      for(var i=0;i<0.2*n;i++)
-          this.generateOvoBu(-150,3,(i*2) - 0.2*n/2);
+      var b = 0.2*n;
+      var m = 0.8*n;
+      var min = -100;
+      var max = 100;
+      var distance  = max - min;
+      var bStep = distance/b;
+      var mStep = distance/m;
 
-      for(var i=0;i<0.8*n;i++)
-          this.generateOvoMa(200,3,(i*2) - 0.8*n/2);
+      for(var i=min+bStep;i<max;i+=mStep)
+          this.generateOvoBu(-150,3,i);
+
+      for(var i=min+mStep;i<max;i+=mStep)
+          this.generateOvoMa(200,3,i);
   }
 
   generateSkyBox(){

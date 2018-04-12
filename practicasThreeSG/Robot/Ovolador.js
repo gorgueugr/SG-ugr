@@ -103,9 +103,9 @@ class OvoMa extends Ovolador{
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
 
+        //var light = new THREE.PointLight(0x0000ff,2.0,5);
+       //light.add(this);
 
-        //var light = new THREE.PointLight(0x0000ff,0.1,5);
-        //this.add(light);
 
 
 
@@ -113,7 +113,7 @@ class OvoMa extends Ovolador{
     };
 
     applyVelocity(){
-        this.vx=  Math.random() * -50 - 1;
+        this.vx=  Math.random() * -100 - 1;
         this.vy = 0;
         this.vz =  0 ;//Math.random() * 25 - 12;
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
