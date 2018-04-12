@@ -12,8 +12,10 @@ class TheScene extends WorldScene {
       this.world.gravity.set(0,-9.82,0);
     
     this.ambientLight = null;
+    this.statusLight = null;
     this.spotLight = null;
     this.camera = null;
+    this.scenicCamera = null;
     this.trackballControls = null;
     //Objects
     this.ground = null;
@@ -49,6 +51,8 @@ class TheScene extends WorldScene {
     var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
 
+    this.scenicCamera = this.camera;
+
     this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
     this.trackballControls.rotateSpeed = 5;
     this.trackballControls.zoomSpeed = -2;
@@ -61,15 +65,21 @@ class TheScene extends WorldScene {
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
-      var ambient = new THREE.AmbientLight( 0xffffff, 0.3 );
-      this.add(ambient);
+      //var ambient = new THREE.AmbientLight( 0x777777, 0.3 );
+      //this.add(ambient);
 
      // var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
      // directionalLight.castShadow = true;
       //this.add(directionalLight);
 
+      //this.statusLight = new THREE.PointLight(0xff0000,1);
+      //this.statusLight.position.set(0,-50,0);
 
-      var spotLight = new THREE.SpotLight( 0xffffff, 0.3 );
+      //this.add( this.statusLight );
+
+
+      var spotLight = new THREE.SpotLight( 0xffffff, 0.2 );
+      spotLight.target = new THREE.Object3D();
       spotLight.position.set( -50, 100, 0 );
       spotLight.angle = Math.PI / 4;
       spotLight.penumbra = 0.05;
@@ -147,6 +157,22 @@ class TheScene extends WorldScene {
           0
       );
 
+      var floor = new PhysicMesh(
+          new THREE.BoxGeometry(1,1,1),
+          new THREE.MeshBasicMaterial(),
+          new CANNON.Box(new CANNON.Vec3(1000,1,1000)),
+          0
+      );
+
+      floor.body.type = CANNON.Body.DYNAMIC;
+
+      floor.position.y = -5;
+
+      //metaLight.lookAt( 0, 0, 0 );
+      //metaLight.target = meta;
+      //this.add(metaLight);
+
+
         meta.body.type = CANNON.Body.DYNAMIC;
 
         meta.position.x = 80;
@@ -157,6 +183,8 @@ class TheScene extends WorldScene {
       this.robot = new Robot();
     this.robot.position.y = 15;
     this.robot.rotation.y = 1.57;
+
+    this.add(floor);
     this.add(meta);
     this.add(this.robot);
     this.add(this.ground);
@@ -173,6 +201,16 @@ class TheScene extends WorldScene {
     this.generateOvo(50);
 
       var that = this;
+
+      floor.body.addEventListener("collide",function (e) {
+          var body = e.body;
+          var o = that.getObjectFromBody(body);
+          console.log("floor");
+          if(o instanceof Robot){
+              o.position.copy(new THREE.Vector3(0,5,0));
+              o.updatePhysicPosition();
+          }
+      });
 
       meta.body.addEventListener("collide",function (e) {
           var body = e.body;
@@ -339,7 +377,7 @@ class TheScene extends WorldScene {
   robotToBack(){
       //this.robot.body.applyImpulse(new CANNON.Vec3(-2,0,0),new CANNON.Vec3(0,0,0));
 
-      this.robot.position.x = this.robot.position.x - 3;
+      this.robot.position.x = this.robot.position.x - 9;
       this.robot.updatePhysicPosition();
 
 
@@ -347,6 +385,13 @@ class TheScene extends WorldScene {
 
     isRobotFlying(){
       return this.robot.position.y == 0;
+    }
+    changeCamera(){
+      if(this.camera == this.scenicCamera){
+          this.camera = this.robot.camera;
+          return;
+      }
+        this.camera = this.scenicCamera;
     }
 
 }

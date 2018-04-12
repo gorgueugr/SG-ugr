@@ -1,7 +1,7 @@
 //made by gorgue
 
 class Robot extends PhysicObject {
-    constructor(parameters){
+    constructor(){
         super();
 
         this.height = null;
@@ -15,6 +15,7 @@ class Robot extends PhysicObject {
 
         this.bodyRobot = null;
         this.head = null;
+        this.camera = null;
 
         var loader = new THREE.TextureLoader();
 
@@ -39,16 +40,6 @@ class Robot extends PhysicObject {
         this.add(this.model);
 
 
-        this.target = new THREE.Object3D();
-        this.target.position.copy(new THREE.Vector3(0,0,10));
-        this.add(this.target);
-
-        this.light = new THREE.SpotLight(0xffffff,1);
-        this.light.position.copy(new THREE.Vector3(0,10,5));
-
-        this.light.target = this.target;
-        this.light.castShadow = true;
-        this.add(this.light);
 
 
         var bbox = new THREE.Box3().setFromObject(this.model);
@@ -147,6 +138,17 @@ class Robot extends PhysicObject {
         eye.position.y = 1;
         eye.position.z = 1.6;
 
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set (0,1,1.6);
+        this.camera.lookAt(new THREE.Vector3(0,0,10));
+
+        this.head.add(this.camera);
+
+        this.light = new THREE.SpotLight(0xffffff,0.5);
+        this.light.position.copy(new THREE.Vector3(0,1,1.6));
+        this.light.castShadow = true;
+        this.head.add(this.light);
+
         this.head.add(eye);
         //this.body.addShape(this.head.body.shapes[0],this.head.position,this.head.quaternion);
         return this.head;
@@ -169,6 +171,11 @@ class Robot extends PhysicObject {
 
     createModel(){
         this.model = new THREE.Mesh();
+
+        this.target = new THREE.Object3D();
+        this.target.position.copy(new THREE.Vector3(0,0,15));
+        this.add(this.target);
+
         this.createBody();
         //this.bodyRobot.position.y = 6;
         this.model.add(this.bodyRobot);
@@ -176,7 +183,8 @@ class Robot extends PhysicObject {
         //this.body = this.head.body;
         this.model.position.y = -4.5;
 
-        //this.model.add(this.target);
+        this.light.target = this.target;
+
 
         return this.model;
     }

@@ -46,7 +46,12 @@ class OvoBu extends Ovolador {
         this.body = new CANNON.Body({mass:10});
         this.body.addShape(this.shape);
 
-        this.material = new THREE.MeshPhongMaterial({color: 0x0000aa , specular: 0x404040});
+        this.material = new THREE.MeshLambertMaterial({color: 0x0000aa ,
+            specular: 0xffffff,
+            emissive: 0x0000aa,
+            transparent:true,
+            opacity:0.5
+        });
         this.model = new THREE.Mesh(
             new THREE.SphereGeometry( this.size, 16, 16 ),
             this.material
@@ -81,7 +86,13 @@ class OvoMa extends Ovolador{
 
         //this.body.quaternion.setFromEuler(0,0,0);
 
-        this.material = new THREE.MeshPhongMaterial({color: 0xff0000 , specular: 0x000000});
+        this.material =new THREE.MeshLambertMaterial({color: 0xaa0000 ,
+            specular: 0xffffff,
+            emissive: 0xff0000,
+            transparent:true,
+            opacity:0.5
+        });
+
         this.model = new PhysicMesh(
             new THREE.CylinderGeometry(width,width,this.size,16,1,false),
             this.material,
@@ -102,12 +113,6 @@ class OvoMa extends Ovolador{
         this.body = this.model.body;
 
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);
-
-        //var light = new THREE.PointLight(0x0000ff,2.0,5);
-       //light.add(this);
-
-
-
 
         return this.model;
     };

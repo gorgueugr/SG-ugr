@@ -184,7 +184,7 @@ function onKeyPress(event) {
     }
     var keyCode = event.key;
     keyCode = keyCode.toLowerCase();
-    console.log(keyCode);
+    //console.log(keyCode);
     switch (keyCode) {
         case "a": //A
             scene.robotToLeft();
@@ -192,11 +192,11 @@ function onKeyPress(event) {
         case "d": //D
             scene.robotToRight();
             break;
-        case "w": //W
-            scene.robotToFront();
+        case "v": //W
+            scene.changeCamera();
           break;
         case "s": //D
-            scene.robotToBack();
+            //scene.robotToBack();
           break;
     }
 }
