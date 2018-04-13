@@ -16,6 +16,8 @@ class Robot extends PhysicObject {
         this.bodyRobot = null;
         this.head = null;
         this.camera = null;
+        this.secondCamera = null;
+        this.view = null;
 
         var loader = new THREE.TextureLoader();
 
@@ -138,9 +140,36 @@ class Robot extends PhysicObject {
         eye.position.y = 1;
         eye.position.z = 1.6;
 
+
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.camera.position.set (0,1,1.6);
         this.camera.lookAt(new THREE.Vector3(0,0,10));
+
+        this.secondCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.secondCamera.position.set (0,1,1.6);
+        this.secondCamera.lookAt(new THREE.Vector3(0,0,-10));
+
+
+        this.view = [
+            {
+                left: 0,
+                top: 0,
+                width: 1.0,
+                height: 0.8,
+                camera: this.camera
+            },
+            {
+                left: 0,
+                top: 0.8,
+                width: 1,
+                height: 0.2,
+                camera: this.secondCamera
+            }
+        ];
+
+
+
+        this.head.add(this.secondCamera);
 
         this.head.add(this.camera);
 

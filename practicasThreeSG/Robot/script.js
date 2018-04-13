@@ -231,7 +231,30 @@ function render() {
   scene.updatePhysics();
   //cannonDebugRenderer.update();      // Update the debug renderer
     TWEEN.update();
-  renderer.render(scene, scene.getCamera());
+    var views = scene.getActualView();
+    console.log(views);
+    for(var i = 0; i<views.length;i++){
+      var view = views[i];
+
+       var windowWidth  = window.innerWidth;
+       var windowHeight = window.innerHeight;
+
+
+        var left   = Math.floor( windowWidth  * view.left );
+        var top    = Math.floor( windowHeight * view.top );
+        var width  = Math.floor( windowWidth  * view.width );
+        var height = Math.floor( windowHeight * view.height );
+
+        renderer.setViewport( left, top, width, height );
+        renderer.setScissor( left, top, width, height );
+        renderer.setScissorTest( true );
+
+        view.camera.aspect = width / height;
+        view.camera.updateProjectionMatrix();
+
+        renderer.render(scene, view.camera);
+
+    }
 }
 
 

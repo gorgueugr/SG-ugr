@@ -24,6 +24,9 @@ class TheScene extends WorldScene {
     this.walll = null;
     this.wallr = null;
 
+    this.view = null;
+    this.actualView = null;
+
     this.createLights ();
     this.createCamera (renderer);
 
@@ -58,8 +61,18 @@ class TheScene extends WorldScene {
     this.trackballControls.zoomSpeed = -2;
     this.trackballControls.panSpeed = 0.5;
     this.trackballControls.target = look;
-    
-    this.add(this.camera);
+
+    this.view = [{
+        left: 0,
+        top: 0,
+        width: 1.0,
+        height: 1.0,
+        camera: this.scenicCamera
+    }];
+
+      this.actualView = this.view;
+
+      this.add(this.camera);
   }
   
   /// It creates lights and adds them to the graph
@@ -283,6 +296,14 @@ class TheScene extends WorldScene {
   getCamera () {
     return this.camera;
   }
+
+  getView(){
+      return this.view;
+  }
+
+  getActualView(){
+    return this.actualView;
+  }
   
   /// It returns the camera controls
   /**
@@ -387,11 +408,11 @@ class TheScene extends WorldScene {
       return this.robot.position.y == 0;
     }
     changeCamera(){
-      if(this.camera == this.scenicCamera){
-          this.camera = this.robot.camera;
+      if(this.actualView == this.view){
+          this.actualView = this.robot.view;
           return;
       }
-        this.camera = this.scenicCamera;
+        this.actualView = this.view;
     }
 
 }
