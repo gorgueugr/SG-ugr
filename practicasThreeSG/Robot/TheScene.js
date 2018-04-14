@@ -13,6 +13,12 @@ class TheScene extends WorldScene {
     
     this.ambientLight = null;
     this.statusLight = null;
+
+    this.ovo = [];
+
+    this.points = 0;
+    this.color = 0x00ff00;
+
     this.spotLight = null;
     this.camera = null;
     this.scenicCamera = null;
@@ -21,6 +27,7 @@ class TheScene extends WorldScene {
     this.ground = null;
     this.robot = null;
 
+    this.meta = null;
     this.walll = null;
     this.wallr = null;
 
@@ -40,8 +47,6 @@ class TheScene extends WorldScene {
     this.model.receiveShadow = true;
 
     this.generateSkyBox();
-
-
   }
   
   /// It creates the camera and adds it to the graph
@@ -165,7 +170,7 @@ class TheScene extends WorldScene {
 
       var meta = new PhysicMesh(
           new THREE.BoxGeometry(10,1,75),
-          new THREE.MeshStandardMaterial({color: 0xff0000}),
+          new THREE.MeshLambertMaterial({color: 0xffffff,emissive:0x0000ff}),
           new CANNON.Box(new CANNON.Vec3(5,1,75)),
           0
       );
@@ -191,6 +196,7 @@ class TheScene extends WorldScene {
         meta.position.x = 80;
         meta.position.y = -0.5;
 
+    this.meta = meta;
 
 
       this.robot = new Robot();
@@ -220,8 +226,8 @@ class TheScene extends WorldScene {
           var o = that.getObjectFromBody(body);
           console.log("floor");
           if(o instanceof Robot){
-              o.position.copy(new THREE.Vector3(0,5,0));
-              o.updatePhysicPosition();
+              //o.reset();
+              that.reset();
           }
       });
 
@@ -230,8 +236,9 @@ class TheScene extends WorldScene {
           var o = that.getObjectFromBody(body);
           console.log("meta");
           if(o instanceof Robot){
-              o.position.copy(new THREE.Vector3(0,5,0));
-              o.updatePhysicPosition();
+             o.reset();
+             that.points = 0;
+             that.setColor();
           }
       });
 
@@ -258,11 +265,17 @@ class TheScene extends WorldScene {
 
           var o = that.getObjectFromBody(body);
           if(o instanceof Ovolador){
-              if(o instanceof OvoMa)
+              if(o instanceof OvoMa){
                   that.robotToBack();
+                  that.minusPoint();
+                  that.setColor();
+                  that.robot.animationHead();
+              }
               else{
                   that.robotToFront();
                   that.robot.animationJump();
+                  that.addPoint();
+                  that.setColor();
               }
               //console.log("Robot choca con " + o.constructor.name);
               o.reset();
@@ -278,9 +291,9 @@ class TheScene extends WorldScene {
    * @controls - The GUI information
    */
   animate (controls) {
-    this.robot.setHeight(controls.height);
-    this.robot.setHeadRotation(controls.rotation);
-    this.robot.setBodyRotation(controls.rotationBody);
+    //this.robot.setHeight(controls.height);
+    //this.robot.setHeadRotation(controls.rotation);
+    //this.robot.setBodyRotation(controls.rotationBody);
   }
 
   updateRobotPosition(){
@@ -329,6 +342,7 @@ class TheScene extends WorldScene {
       ovobu.position.copy(xyz);
       ovobu.initPosition.copy(xyz);
 
+      this.ovo.push(ovobu);
       this.add(ovobu);
   }
   generateOvoMa(x,y,z){
@@ -337,7 +351,7 @@ class TheScene extends WorldScene {
 
       ovoma.position.copy(xyz);
       ovoma.initPosition.copy(xyz);
-
+      this.ovo.push(ovoma);
       this.add(ovoma);
   }
 
@@ -351,7 +365,7 @@ class TheScene extends WorldScene {
       var mStep = distance/m;
 
       for(var i=min+bStep;i<max;i+=mStep)
-          this.generateOvoBu(-150,3,i);
+          this.generateOvoBu(-150,7,i);
 
       for(var i=min+mStep;i<max;i+=mStep)
           this.generateOvoMa(200,3,i);
@@ -373,18 +387,24 @@ class TheScene extends WorldScene {
   }
 
   robotToLeft(){
-
-      //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
-      this.robot.position.z = this.robot.position.z - 3;
-      this.robot.updatePhysicPosition();
-
+      var force = this.robot.body.velocity;
+      //console.log(force);
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){
+          //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
+          this.robot.position.z = this.robot.position.z - 3;
+          this.robot.updatePhysicPosition();
+      }
   }
 
   robotToRight(){
-      //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,1.5),new CANNON.Vec3(0,0,0));
+      var force = this.robot.body.velocity;
+      //console.log(force);
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){
+          //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
+          this.robot.position.z = this.robot.position.z + 3;
+          this.robot.updatePhysicPosition();
+      }
 
-      this.robot.position.z = this.robot.position.z + 3;
-      this.robot.updatePhysicPosition();
 
   }
 
@@ -404,6 +424,15 @@ class TheScene extends WorldScene {
 
   }
 
+  robotJump(){
+      var force = this.robot.body.velocity;
+      //console.log(force);
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0 && this.points == 10) {
+          this.robot.animationJump();
+          this.robot.body.applyImpulse(new CANNON.Vec3(0, 10, 0), new CANNON.Vec3(0, 0, 0));
+      }
+  }
+
     isRobotFlying(){
       return this.robot.position.y == 0;
     }
@@ -415,6 +444,66 @@ class TheScene extends WorldScene {
         this.actualView = this.view;
     }
 
+    setColor(){
+      var hex = 0x000000;
+        console.log(this.points);
+        switch(this.points){
+            case 0:
+             hex= 0xff0000;
+                break;
+            case 1:
+                hex= 0xff3300;
+                break;
+            case 2:
+                hex= 0xff6600;
+                break;
+            case 3:
+                hex= 0xffcc66;
+                break;
+            case 4:
+                hex= 0xffcc00;
+                break;
+            case 5:
+                hex= 0xffff99;
+                break;
+            case 6:
+                hex= 0xffff66;
+                break;
+            case 7:
+                hex= 0xccff99;
+                break;
+            case 8:
+                hex= 0xccff66;
+                break;
+            case 9:
+                hex= 0x99ff33;
+                break;
+            case 10:
+                hex= 0x0000ff;
+                break;
+        }
+        //console.log(this.meta.material.color);
+        this.meta.material.emissive.setHex(hex);
+        this.meta.material.color.setHex(hex);
+    }
+
+    addPoint(){
+        this.points = this.points >= 9 ? 10:this.points+=1;
+
+    }
+
+    minusPoint(){
+        this.points = this.points <= 3 ? 0:this.points-=3;
+    }
+
+    reset(){
+      this.robot.reset();
+      this.points = 0;
+      this.setColor();
+      for(var i=0;i<this.ovo.length;i++){
+          this.ovo[i].reset();
+      }
+    }
 }
 
 

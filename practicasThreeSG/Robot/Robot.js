@@ -63,6 +63,7 @@ class Robot extends PhysicObject {
         this.model.castShadow = true;
         this.model.receiveShadow = true;
 
+        this.setHeight(0);
     }
     //Override
     updateViewPosition(){
@@ -173,10 +174,14 @@ class Robot extends PhysicObject {
 
         this.head.add(this.camera);
 
+        this.target = new THREE.Object3D();
+        this.target.position.set(0,0,15);
+        this.head.add(this.target);
+
         this.light = new THREE.SpotLight(0xffffff,0.5);
-        this.light.position.copy(new THREE.Vector3(0,1,1.6));
+        this.light.target = this.target;
         this.light.castShadow = true;
-        this.head.add(this.light);
+        eye.add(this.light);
 
         this.head.add(eye);
         //this.body.addShape(this.head.body.shapes[0],this.head.position,this.head.quaternion);
@@ -200,10 +205,6 @@ class Robot extends PhysicObject {
 
     createModel(){
         this.model = new THREE.Mesh();
-
-        this.target = new THREE.Object3D();
-        this.target.position.copy(new THREE.Vector3(0,0,15));
-        this.add(this.target);
 
         this.createBody();
         //this.bodyRobot.position.y = 6;
@@ -242,19 +243,54 @@ class Robot extends PhysicObject {
     }
 
     animationJump(){
-        console.log("jump");
-        var position = { y: 0.0 };
-        var target = { y: 2.0 };
+        //console.log("jump");
+        var orig = {y:0};
+        var position = { y: 0 };
+        var target = { y: 2 };
         var tween = new TWEEN.Tween(position).to(target, 350);
-        var tweenB =  new TWEEN.Tween(target).to(position, 350);
+        var tweenB =  new TWEEN.Tween(target).to(orig, 350);
         var that = this;
         tween.onUpdate(function(){
             that.setHeight(position.y);
+        });
+        tweenB.onUpdate(function () {
+            that.setHeight(target.y);
         });
         tween.chain(tweenB);
         tween.start();
     }
 
+    animationHead(){
+        var orig = { y:0 };
+        var position = { y: 0 };
+        var target = { y: -1.4 };
+        var target2= { y: 1.4 };
+        var tween = new TWEEN.Tween(position).to(target, 350);
+        var tweenB =  new TWEEN.Tween(target).to(target2, 350);
+        var tweenC = new TWEEN.Tween(target2).to(orig, 350);
+        var that = this;
+        tween.onUpdate(function(){
+            that.setHeadRotation(position.y);
+        });
+        tweenB.onUpdate(function () {
+            that.setHeadRotation(target.y);
+        });
+        tweenC.onUpdate(function () {
+            that.setHeadRotation(target2.y);
+        });
+        tween.chain(tweenB);
+        tweenB.chain(tweenC);
+        tween.start();
+    }
+
+    reset(){
+        this.body.velocity.set(0, 0, 0);
+        this.body.angularVelocity.set(0, 0, 0);
+        this.position.set(0,5,0);
+        this.body.force.setZero();
+        this.body.torque.setZero();
+        this.updatePhysicPosition();
+    }
 
 
 

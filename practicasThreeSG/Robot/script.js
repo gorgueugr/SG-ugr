@@ -16,6 +16,9 @@ mouseDown = false;
 /// The current mode of the application
 applicationMode = TheScene.NO_ACTION;
 
+rend = true;
+
+start = false;
 //debug
 cannonDebugRenderer = null;
 /// It creates the GUI and, optionally, adds statistic information
@@ -23,42 +26,23 @@ cannonDebugRenderer = null;
  * @param withStats - A boolean to show the statictics or not
  */
 function createGUI (withStats) {
-  GUIcontrols = new function() {
-    this.axis = true;
-    this.turnLight = true;
-    this.lightIntensity = 0.5;
-    //Robot
-    this.rotation = 0.0;
-    this.rotationBody = 0.0;
-    this.height   = 0.0;
-    //
-    this.addBox   = function () {
-      setMessage ("Añadir cajas clicando en el suelo");
-      applicationMode = TheScene.ADDING_BOXES;
-    };
-    this.moveBox  = function () {
-      setMessage ("Mover y rotar cajas clicando en ellas");
-      applicationMode = TheScene.MOVING_BOXES;
-    };
-  }
-  
-  var gui = new dat.GUI();
-  var axisLights = gui.addFolder ('Axis and Lights');
-    axisLights.add(GUIcontrols, 'axis').name('Axis on/off :');
-    axisLights.add(GUIcontrols, 'turnLight').name('Turn light on/off :');
-    axisLights.add(GUIcontrols, 'lightIntensity', 0, 1.0).name('Light intensity :');
-  
-  var actions = gui.addFolder ('Actions');
-    var addingBoxes = actions.add(GUIcontrols, 'addBox').name (': Adding boxes :');
-    var movingBoxes = actions.add (GUIcontrols, 'moveBox').name (': Move and rotate boxes :');
+    GUIcontrols = new function () {
+        //
 
-    var robot = gui.addFolder('Robot');
-      robot.add(GUIcontrols, 'height', 0, 2.0).name(':Altura del robot :');
-      robot.add(GUIcontrols, 'rotation', -1.4, 1.4).name(':Cabeza del robot :');
-      robot.add(GUIcontrols, 'rotationBody', -0.75, 0.5).name(':Cuerpo del robot :');
+        this.difficulty = 1;
+        this.start = function () {
+            restart();
+        };
 
-    if (withStats)
-    stats = initStats();
+    }
+        var gui = new dat.GUI();
+        gui.add(GUIcontrols, 'difficulty', {low: 1, mid: 2, high: 3});
+        gui.add(GUIcontrols, 'start');
+
+
+        if (withStats)
+            stats = initStats();
+
 }
 
 /// It adds statistics information to a previously created Div
@@ -179,12 +163,9 @@ function onMouseWheel (event) {
 }
 
 function onKeyPress(event) {
-    if(scene.isRobotFlying()){
-      return;
-    }
     var keyCode = event.key;
     keyCode = keyCode.toLowerCase();
-    //console.log(keyCode);
+    console.log(keyCode);
     switch (keyCode) {
         case "a": //A
             scene.robotToLeft();
@@ -197,6 +178,9 @@ function onKeyPress(event) {
           break;
         case "s": //D
             //scene.robotToBack();
+          break;
+        case " ":
+          scene.robotJump();
           break;
     }
 }
@@ -223,6 +207,8 @@ function createRenderer () {
 
 /// It renders every frame
 function render() {
+  if(!rend)
+    return;
   requestAnimationFrame(render);
   
   stats.update();
@@ -231,8 +217,9 @@ function render() {
   scene.updatePhysics();
   //cannonDebugRenderer.update();      // Update the debug renderer
     TWEEN.update();
+
     var views = scene.getActualView();
-    console.log(views);
+    //console.log(views);
     for(var i = 0; i<views.length;i++){
       var view = views[i];
 
@@ -258,31 +245,36 @@ function render() {
 }
 
 
+function restart(){
+
+    scene.reset();
+    // create a render and set the size
+
+}
+
 /// The main function
 $(function () {
 
 
-  // create a render and set the size
-  renderer = createRenderer();
-  // add the output of the renderer to the html element
-  $("#WebGL-output").append(renderer.domElement);
-  // liseners
-  window.addEventListener ("resize", onWindowResize);
-  window.addEventListener ("mousemove", onMouseMove, true);
-  window.addEventListener ("mousedown", onMouseDown, true);
-  window.addEventListener ("mouseup", onMouseUp, true);
-  window.addEventListener ("mousewheel", onMouseWheel, true);   // For Chrome an others
-  window.addEventListener ("DOMMouseScroll", onMouseWheel, true); // For Firefox
+    renderer = createRenderer();
+    // add the output of the renderer to the html element
+    $("#WebGL-output").append(renderer.domElement);
+
+    // liseners
+    window.addEventListener ("resize", onWindowResize);
+    window.addEventListener ("mousemove", onMouseMove, true);
+    window.addEventListener ("mousedown", onMouseDown, true);
+    window.addEventListener ("mouseup", onMouseUp, true);
+    window.addEventListener ("mousewheel", onMouseWheel, true);   // For Chrome an others
+    window.addEventListener ("DOMMouseScroll", onMouseWheel, true); // For Firefox
     window.addEventListener ("keypress", onKeyPress, true);
-
-
-
-    // create a scene, that will hold all our elements such as objects, cameras and lights.
-  scene = new TheScene (renderer.domElement);
-  cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, scene.world );
-
 
     createGUI(true);
 
-  render();
+    scene = new TheScene (renderer.domElement);
+    render();
+    // create a scene, that will hold all our elements such as objects, cameras and lights.
+    //cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, scene.world );
+    //render();
+
 });
