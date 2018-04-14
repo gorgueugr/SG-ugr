@@ -30,12 +30,14 @@ function createGUI (withStats) {
         //
 
         this.difficulty = 1;
+        this.volume = 0.2;
         this.start = function () {
             restart();
         };
 
     }
         var gui = new dat.GUI();
+        gui.add(GUIcontrols,'volume',0.0,1.0).step(0.1);
         gui.add(GUIcontrols, 'difficulty', {low: 1, mid: 2, high: 3});
         gui.add(GUIcontrols, 'start');
 
@@ -165,7 +167,7 @@ function onMouseWheel (event) {
 function onKeyPress(event) {
     var keyCode = event.key;
     keyCode = keyCode.toLowerCase();
-    console.log(keyCode);
+    //console.log(keyCode);
     switch (keyCode) {
         case "a": //A
             scene.robotToLeft();

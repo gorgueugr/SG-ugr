@@ -47,7 +47,6 @@ class OvoBu extends Ovolador {
         this.body.addShape(this.shape);
 
         this.material = new THREE.MeshLambertMaterial({color: 0x0000aa ,
-            specular: 0xffffff,
             emissive: 0x0000aa,
             transparent:true,
             opacity:0.5
@@ -78,6 +77,7 @@ class OvoBu extends Ovolador {
 class OvoMa extends Ovolador{
     constructor(){
         super();
+        this.difficulty = 1;
     }
 
     createModel(){
@@ -118,7 +118,7 @@ class OvoMa extends Ovolador{
     };
 
     applyVelocity(){
-        this.vx=  Math.random() * -100 - 1;
+        this.vx=  Math.random() * -100 * this.difficulty - 1;
         this.vy = 0;
         this.vz =  0 ;//Math.random() * 25 - 12;
         this.body.velocity = new CANNON.Vec3(this.vx,this.vy,this.vz);

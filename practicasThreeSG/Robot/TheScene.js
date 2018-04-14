@@ -16,6 +16,7 @@ class TheScene extends WorldScene {
 
     this.ovo = [];
 
+      this.difficulty = 1;
     this.points = 0;
     this.color = 0x00ff00;
 
@@ -23,9 +24,12 @@ class TheScene extends WorldScene {
     this.camera = null;
     this.scenicCamera = null;
     this.trackballControls = null;
+      this.listener = null;
     //Objects
     this.ground = null;
     this.robot = null;
+
+    this.volume = 0.2;
 
     this.meta = null;
     this.walll = null;
@@ -46,6 +50,39 @@ class TheScene extends WorldScene {
     this.model.castShadow = true;
     this.model.receiveShadow = true;
 
+      this.listener = new THREE.AudioListener();
+      this.add( this.listener );
+
+      // create a global audio source
+      this.sound = new THREE.Audio( this.listener );
+      this.goodSound = new THREE.Audio( this.listener );
+      this.badSound = new THREE.Audio( this.listener );
+
+    // load a sound and set it as the Audio object's buffer
+      var audioLoader = new THREE.AudioLoader();
+      var that = this;
+      audioLoader.load( 'sounds/music.mp3', function( buffer ) {
+          that.sound.setBuffer(buffer);
+          that.sound.setLoop(true);
+          that.sound.setVolume(that.volume);
+          that.sound.play();
+      });
+
+      audioLoader.load( 'sounds/good.mp3', function( buffer ) {
+          that.goodSound.setBuffer(buffer);
+          that.goodSound.setLoop(false);
+          that.goodSound.setVolume(that.volume);
+      });
+
+      audioLoader.load( 'sounds/bad.mp3', function( buffer ) {
+          that.badSound.setBuffer(buffer);
+          that.badSound.setLoop(false);
+          that.badSound.setVolume(that.volume);
+      });
+
+
+
+      this.setColor();
     this.generateSkyBox();
   }
   
@@ -217,14 +254,13 @@ class TheScene extends WorldScene {
       });
       tweenOvo.start();
       */
-    this.generateOvo(50);
 
       var that = this;
 
       floor.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          console.log("floor");
+          //console.log("floor");
           if(o instanceof Robot){
               //o.reset();
               that.reset();
@@ -234,7 +270,7 @@ class TheScene extends WorldScene {
       meta.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          console.log("meta");
+          //console.log("meta");
           if(o instanceof Robot){
              o.reset();
              that.points = 0;
@@ -270,12 +306,15 @@ class TheScene extends WorldScene {
                   that.minusPoint();
                   that.setColor();
                   that.robot.animationHead();
+                  that.badSound.play();
               }
               else{
                   that.robotToFront();
                   that.robot.animationJump();
                   that.addPoint();
                   that.setColor();
+                  that.goodSound.play();
+
               }
               //console.log("Robot choca con " + o.constructor.name);
               o.reset();
@@ -291,7 +330,17 @@ class TheScene extends WorldScene {
    * @controls - The GUI information
    */
   animate (controls) {
-    //this.robot.setHeight(controls.height);
+      //console.log(this.volume);
+      if(this.difficulty != controls.difficulty){
+          this.difficulty = controls.difficulty;
+          this.reset();
+      }
+      this.volume = controls.volume.toFixed(1);
+      this.sound.setVolume( this.volume );
+      this.goodSound.setVolume( this.volume );
+      this.badSound.setVolume( this.volume );
+
+      //this.robot.setHeight(controls.height);
     //this.robot.setHeadRotation(controls.rotation);
     //this.robot.setBodyRotation(controls.rotationBody);
   }
@@ -345,12 +394,13 @@ class TheScene extends WorldScene {
       this.ovo.push(ovobu);
       this.add(ovobu);
   }
-  generateOvoMa(x,y,z){
+  generateOvoMa(x,y,z,d){
       var ovoma = new OvoMa();
       var xyz = new THREE.Vector3(x,y,z);
 
       ovoma.position.copy(xyz);
       ovoma.initPosition.copy(xyz);
+      ovoma.difficulty = d;
       this.ovo.push(ovoma);
       this.add(ovoma);
   }
@@ -368,7 +418,7 @@ class TheScene extends WorldScene {
           this.generateOvoBu(-150,7,i);
 
       for(var i=min+mStep;i<max;i+=mStep)
-          this.generateOvoMa(200,3,i);
+          this.generateOvoMa(200,3,i,this.difficulty);
   }
 
   generateSkyBox(){
@@ -418,7 +468,7 @@ class TheScene extends WorldScene {
   robotToBack(){
       //this.robot.body.applyImpulse(new CANNON.Vec3(-2,0,0),new CANNON.Vec3(0,0,0));
 
-      this.robot.position.x = this.robot.position.x - 9;
+      this.robot.position.x = this.robot.position.x - 9 * this.difficulty;
       this.robot.updatePhysicPosition();
 
 
@@ -446,7 +496,7 @@ class TheScene extends WorldScene {
 
     setColor(){
       var hex = 0x000000;
-        console.log(this.points);
+        //console.log(this.points);
         switch(this.points){
             case 0:
              hex= 0xff0000;
@@ -497,12 +547,13 @@ class TheScene extends WorldScene {
     }
 
     reset(){
-      this.robot.reset();
+        this.robot.reset();
       this.points = 0;
       this.setColor();
       for(var i=0;i<this.ovo.length;i++){
           this.ovo[i].reset();
       }
+
     }
 }
 
