@@ -9,22 +9,26 @@ class TheScene extends WorldScene {
     super();
     
     // Attributes
+      //Gravity of physic world
       this.world.gravity.set(0,-9.82,0);
     
     this.ambientLight = null;
-    this.statusLight = null;
 
-    this.ovo = [];
+    this.ovo = []; //Flying objects
 
-      this.difficulty = 1;
-    this.points = 0;
+    this.difficulty = 1; //Difficulty
+
+    this.points = 0;  //Player points
+
     this.color = 0x00ff00;
 
     this.spotLight = null;
+
     this.camera = null;
     this.scenicCamera = null;
+
     this.trackballControls = null;
-      this.listener = null;
+    this.listener = null;
     //Objects
     this.ground = null;
     this.robot = null;
@@ -50,6 +54,15 @@ class TheScene extends WorldScene {
     this.model.castShadow = true;
     this.model.receiveShadow = true;
 
+
+    this.createAudio();
+
+    this.setColor();
+    this.generateSkyBox();
+    this.generateOvo(50);
+  }
+
+  createAudio(){
       this.listener = new THREE.AudioListener();
       this.add( this.listener );
 
@@ -58,7 +71,7 @@ class TheScene extends WorldScene {
       this.goodSound = new THREE.Audio( this.listener );
       this.badSound = new THREE.Audio( this.listener );
 
-    // load a sound and set it as the Audio object's buffer
+      // load a sound and set it as the Audio object's buffer
       var audioLoader = new THREE.AudioLoader();
       var that = this;
       audioLoader.load( 'sounds/music.mp3', function( buffer ) {
@@ -79,11 +92,6 @@ class TheScene extends WorldScene {
           that.badSound.setLoop(false);
           that.badSound.setVolume(that.volume);
       });
-
-
-
-      this.setColor();
-    this.generateSkyBox();
   }
   
   /// It creates the camera and adds it to the graph
@@ -170,6 +178,7 @@ class TheScene extends WorldScene {
       var wallMaterial = new THREE.MeshPhongMaterial({map:nave});
       var wallPhysic = new CANNON.Box(new CANNON.Vec3(0.1,1000,1000));
 
+      //Walls to detect collisions with Flying objects to reset its position
       var wallMass = 0;
       this.walll = new PhysicMesh(
           wallGeometry,
@@ -186,10 +195,10 @@ class TheScene extends WorldScene {
       );
 
       //ESto se hace debido a que cannon no detecta colisiones entre
-      // Kinematics bodys y al generar un body con masa 0 le atribuye kinematic por defecto
+      // Kinematics bodies y al generar un body con masa 0 le atribuye kinematic por defecto
       this.walll.body.type = CANNON.Body.DYNAMIC;
       this.wallr.body.type = CANNON.Body.DYNAMIC;
-
+      //
       this.walll.position.x = -90;
       this.walll.visible = false;
       this.wallr.position.x = 200;
@@ -198,13 +207,12 @@ class TheScene extends WorldScene {
 
       this.add(this.walll);
       this.add(this.wallr);
-
+      //__
 
       this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial({map: textura}), 4);
-      //this.ground = new Ground (300, 300, new THREE.MeshPhongMaterial(), 4);
-      //this.ground.ground.receiveShadow = true;
 
 
+      //Linea de meta cambia su color segun puntos
       var meta = new PhysicMesh(
           new THREE.BoxGeometry(10,1,75),
           new THREE.MeshLambertMaterial({color: 0xffffff,emissive:0x0000ff}),
@@ -212,29 +220,27 @@ class TheScene extends WorldScene {
           0
       );
 
+
+
+      meta.body.type = CANNON.Body.DYNAMIC;
+
+      meta.position.x = 80;
+      meta.position.y = -0.5;
+
+      this.meta = meta;
+      //__Meta
+
+      //Suelo bajo ground para detectar caidas del robot del ground
       var floor = new PhysicMesh(
           new THREE.BoxGeometry(1,1,1),
           new THREE.MeshBasicMaterial(),
           new CANNON.Box(new CANNON.Vec3(1000,1,1000)),
           0
       );
-
       floor.body.type = CANNON.Body.DYNAMIC;
 
       floor.position.y = -5;
-
-      //metaLight.lookAt( 0, 0, 0 );
-      //metaLight.target = meta;
-      //this.add(metaLight);
-
-
-        meta.body.type = CANNON.Body.DYNAMIC;
-
-        meta.position.x = 80;
-        meta.position.y = -0.5;
-
-    this.meta = meta;
-
+      //__Floor
 
       this.robot = new Robot();
     this.robot.position.y = 15;
@@ -244,25 +250,13 @@ class TheScene extends WorldScene {
     this.add(meta);
     this.add(this.robot);
     this.add(this.ground);
-/*
-    var position = { y: 1 };
-      var target = { y: 5 };
-      var tweenOvo = new TWEEN.Tween(position).to(target, 300);
-      var that = this;
-      tweenOvo.onUpdate(function(){
-          that.generateOvo(position.y);
-      });
-      tweenOvo.start();
-      */
 
+    //Detectores de colisiones
       var that = this;
-
       floor.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          //console.log("floor");
-          if(o instanceof Robot){
-              //o.reset();
+          if(o instanceof Robot){//Suelo choca con robot
               that.reset();
           }
       });
@@ -270,18 +264,16 @@ class TheScene extends WorldScene {
       meta.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          //console.log("meta");
-          if(o instanceof Robot){
-             o.reset();
-             that.points = 0;
-             that.setColor();
+          if(o instanceof Robot){ //Meta choca con robot
+             that.reset();
           }
       });
+
 
       this.wallr.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          if(o instanceof OvoBu){
+          if(o instanceof OvoBu){ //PAred derecha choca con OvoBu
               //console.log("Wallr choca con " + o.constructor.name);
               o.reset();
           }
@@ -290,7 +282,7 @@ class TheScene extends WorldScene {
       this.walll.body.addEventListener("collide",function (e) {
           var body = e.body;
           var o = that.getObjectFromBody(body);
-          if(o instanceof OvoMa){
+          if(o instanceof OvoMa){ //PAred derecha choca con OvoMa
               //console.log("Walll choca con " + o.constructor.name);
               o.reset();
           }
@@ -300,7 +292,7 @@ class TheScene extends WorldScene {
           var body = e.body;
 
           var o = that.getObjectFromBody(body);
-          if(o instanceof Ovolador){
+          if(o instanceof Ovolador){ //OVO choca con robot
               if(o instanceof OvoMa){
                   that.robotToBack();
                   that.minusPoint();
@@ -331,7 +323,7 @@ class TheScene extends WorldScene {
    */
   animate (controls) {
       //console.log(this.volume);
-      if(this.difficulty != controls.difficulty){
+      if(this.difficulty != controls.difficulty){ //Si se cambia de dificultad se reinicia
           this.difficulty = controls.difficulty;
           this.reset();
       }
@@ -340,17 +332,8 @@ class TheScene extends WorldScene {
       this.goodSound.setVolume( this.volume );
       this.badSound.setVolume( this.volume );
 
-      //this.robot.setHeight(controls.height);
-    //this.robot.setHeadRotation(controls.rotation);
-    //this.robot.setBodyRotation(controls.rotationBody);
   }
 
-  updateRobotPosition(){
-      this.robot.position.z = this.robotZ;
-      this.robot.position.x = this.robotX;
-      console.log(  this.robot.position.z,  this.robot.position.x);
-  }
-  
   /// It returns the camera
   /**
    * @return The camera
@@ -384,12 +367,13 @@ class TheScene extends WorldScene {
     this.camera.updateProjectionMatrix();
   }
 
-  generateOvoBu(x,y,z){
+  generateOvoBu(x,y,z,d){
       var ovobu = new OvoBu();
       var xyz = new THREE.Vector3(x,y,z);
 
       ovobu.position.copy(xyz);
       ovobu.initPosition.copy(xyz);
+      ovobu.difficulty = d;
 
       this.ovo.push(ovobu);
       this.add(ovobu);
@@ -401,6 +385,7 @@ class TheScene extends WorldScene {
       ovoma.position.copy(xyz);
       ovoma.initPosition.copy(xyz);
       ovoma.difficulty = d;
+
       this.ovo.push(ovoma);
       this.add(ovoma);
   }
@@ -415,7 +400,7 @@ class TheScene extends WorldScene {
       var mStep = distance/m;
 
       for(var i=min+bStep;i<max;i+=mStep)
-          this.generateOvoBu(-150,7,i);
+          this.generateOvoBu(-150,7,i,this.difficulty);
 
       for(var i=min+mStep;i<max;i+=mStep)
           this.generateOvoMa(200,3,i,this.difficulty);
@@ -439,7 +424,7 @@ class TheScene extends WorldScene {
   robotToLeft(){
       var force = this.robot.body.velocity;
       //console.log(force);
-      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){ //Si el robot esta estatico
           //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
           this.robot.position.z = this.robot.position.z - 3;
           this.robot.updatePhysicPosition();
@@ -449,7 +434,7 @@ class TheScene extends WorldScene {
   robotToRight(){
       var force = this.robot.body.velocity;
       //console.log(force);
-      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0){ //Si el robot esta estatico
           //this.robot.body.applyImpulse(new CANNON.Vec3(0,0,-1.5),new CANNON.Vec3(0,0,0));
           this.robot.position.z = this.robot.position.z + 3;
           this.robot.updatePhysicPosition();
@@ -477,15 +462,13 @@ class TheScene extends WorldScene {
   robotJump(){
       var force = this.robot.body.velocity;
       //console.log(force);
-      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0 && this.points == 10) {
+      if(force.x == 0 && Math.round(force.y) == 0 && force.z == 0 && this.points == 10) { //Si el robot esta estatico
+          // y tenemos 10 puntos
           this.robot.animationJump();
           this.robot.body.applyImpulse(new CANNON.Vec3(0, 10, 0), new CANNON.Vec3(0, 0, 0));
       }
   }
 
-    isRobotFlying(){
-      return this.robot.position.y == 0;
-    }
     changeCamera(){
       if(this.actualView == this.view){
           this.actualView = this.robot.view;
@@ -494,7 +477,7 @@ class TheScene extends WorldScene {
         this.actualView = this.view;
     }
 
-    setColor(){
+    setColor(){ //Cambia el color de la meta
       var hex = 0x000000;
         //console.log(this.points);
         switch(this.points){
@@ -546,30 +529,16 @@ class TheScene extends WorldScene {
         this.points = this.points <= 3 ? 0:this.points-=3;
     }
 
-    reset(){
-        this.robot.reset();
+    reset(){ //Reinicia partida
+      this.robot.reset();
       this.points = 0;
       this.setColor();
       for(var i=0;i<this.ovo.length;i++){
+          this.ovo[i].difficulty = this.difficulty;
           this.ovo[i].reset();
       }
-
     }
 }
 
-
-  // class variables
-  
-  // Application modes
-  TheScene.NO_ACTION = 0;
-  TheScene.ADDING_BOXES = 1;
-  TheScene.MOVING_BOXES = 2;
-  
-  // Actions
-  TheScene.NEW_BOX = 0;
-  TheScene.MOVE_BOX = 1;
-  TheScene.SELECT_BOX = 2;
-  TheScene.ROTATE_BOX = 3;
-  TheScene.END_ACTION = 10;
 
 

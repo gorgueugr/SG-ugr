@@ -1,8 +1,16 @@
-
-/// The Ground class
+//Based on:
 /**
  * @author FVelasco
  * 
+ * @param aWidth - The width of the ground
+ * @param aDeep - The deep of the ground
+ * @param aMaterial - The material of the ground
+ * @param aBoxSize - The size for the boxes
+ */
+//Modified by:
+/**
+ * @author Jorge Soler
+ *
  * @param aWidth - The width of the ground
  * @param aDeep - The deep of the ground
  * @param aMaterial - The material of the ground
@@ -20,6 +28,7 @@ class Ground extends PhysicObject {
 
     this.ground = null;
 
+    //Physics:
       this.shape = new CANNON.Box(new CANNON.Vec3(this.width/4,2,this.deep/6));
 
       this.ground = new PhysicMesh(
@@ -28,6 +37,10 @@ class Ground extends PhysicObject {
       this.shape,
           0
     );
+      this.body = new CANNON.Body({mass:0});
+      this.body.addShape(this.ground.shape);
+
+    //__
 
     this.ground.applyMatrix (new THREE.Matrix4().makeTranslation (0,1,0));
     this.ground.castShadow = true;
@@ -37,8 +50,6 @@ class Ground extends PhysicObject {
     this.add (this.ground);
 
 
-    this.body = new CANNON.Body({mass:0});
-    this.body.addShape(this.ground.shape);
     this.position.y = -2;
 
 

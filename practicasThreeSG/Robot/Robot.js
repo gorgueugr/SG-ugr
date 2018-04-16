@@ -15,6 +15,8 @@ class Robot extends PhysicObject {
 
         this.bodyRobot = null;
         this.head = null;
+
+
         this.camera = null;
         this.secondCamera = null;
         this.view = null;
@@ -33,32 +35,30 @@ class Robot extends PhysicObject {
         this.headMaterial = new THREE.MeshPhongMaterial( { map:  this.headTexture, specular: 0xffffff ,shininess: 15} );
         this.headTexture.wrapS = this.headTexture.wrapT = THREE.RepeatWrapping;
 
+        //Physic
         this.body = new CANNON.Body({mass:1});
 
         this.castShadow = true;
         this.receiveShadow = true;
+
+        this.createCamera();
+        this.createLight();
 
         this.model = this.createModel();
         this.add(this.model);
 
 
 
-
+        //Bounding box for physic size
         var bbox = new THREE.Box3().setFromObject(this.model);
         var a = bbox.getSize();
-        //var abox = new THREE.Vector3(bbox.min);
-        //console.log(a);
 
         this.shape = new CANNON.Sphere(a.y/2);
          // this.shape = new CANNON.Box(new CANNON.Vec3(a.x/2,a.y/2,a.z/2));
 
-        //this.body.addShape(new CANNON.Sphere(2),new CANNON.Vec3(0,2.5,0),this.head.geometry.quaternion);
-        //this.body.addShape(new CANNON.Cylinder(2,2,4,16),new CANNON.Vec3(0,2.5,0),this.bodyRobot.geometry.quaternion);
         this.body.addShape(this.shape,this.position,this.quaternion);
-        //this.shape = new CANNON.Box(new CANNON.Vec3(3,3,3));
 
         this.updatePhysicPosition();
-       // this.body.addShape(this.shape);
 
         this.model.castShadow = true;
         this.model.receiveShadow = true;
@@ -69,8 +69,46 @@ class Robot extends PhysicObject {
     updateViewPosition(){
         if(this.body != null) {
             this.position.copy(this.body.position);
+            //I dont want the robot to update its quaternion
             //this.quaternion.copy(this.body.quaternion);
         }
+    }
+
+    createCamera(){
+        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera.position.set (0,1,1.6);
+        this.camera.lookAt(new THREE.Vector3(0,0,10));
+
+        this.secondCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.secondCamera.position.set (0,1,1.6);
+        this.secondCamera.lookAt(new THREE.Vector3(0,0,-10));
+
+
+        this.view = [
+            {
+                left: 0,
+                top: 0,
+                width: 1.0,
+                height: 0.8,
+                camera: this.camera
+            },
+            {
+                left: 0,
+                top: 0.8,
+                width: 1,
+                height: 0.2,
+                camera: this.secondCamera
+            }
+        ];
+    }
+    createLight(){
+
+        this.target = new THREE.Object3D();
+        this.target.position.set(0,0,15);
+
+        this.light = new THREE.SpotLight(0xffffff,0.5);
+        this.light.target = this.target;
+        this.light.castShadow = true;
     }
 
     createArm(){
@@ -142,49 +180,15 @@ class Robot extends PhysicObject {
         eye.position.z = 1.6;
 
 
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.camera.position.set (0,1,1.6);
-        this.camera.lookAt(new THREE.Vector3(0,0,10));
-
-        this.secondCamera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.secondCamera.position.set (0,1,1.6);
-        this.secondCamera.lookAt(new THREE.Vector3(0,0,-10));
-
-
-        this.view = [
-            {
-                left: 0,
-                top: 0,
-                width: 1.0,
-                height: 0.8,
-                camera: this.camera
-            },
-            {
-                left: 0,
-                top: 0.8,
-                width: 1,
-                height: 0.2,
-                camera: this.secondCamera
-            }
-        ];
-
-
-
         this.head.add(this.secondCamera);
-
         this.head.add(this.camera);
 
-        this.target = new THREE.Object3D();
-        this.target.position.set(0,0,15);
-        this.head.add(this.target);
 
-        this.light = new THREE.SpotLight(0xffffff,0.5);
-        this.light.target = this.target;
-        this.light.castShadow = true;
+        this.head.add(this.target);
         eye.add(this.light);
 
         this.head.add(eye);
-        //this.body.addShape(this.head.body.shapes[0],this.head.position,this.head.quaternion);
+
         return this.head;
     }
 
@@ -291,7 +295,5 @@ class Robot extends PhysicObject {
         this.body.torque.setZero();
         this.updatePhysicPosition();
     }
-
-
 
 }
