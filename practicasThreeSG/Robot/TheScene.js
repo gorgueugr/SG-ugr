@@ -48,6 +48,8 @@ class TheScene extends WorldScene {
     //this.axis = new THREE.AxisHelper (25);
     //this.add (this.axis);
 
+      this.gra = null;
+
     this.model = this.createModel ();
     this.add (this.model);
 
@@ -327,6 +329,19 @@ class TheScene extends WorldScene {
           this.difficulty = controls.difficulty;
           this.reset();
       }
+      if(this.gra.radio != controls.radio){
+          this.gra.radio = controls.radio;
+          this.gra.stopAnimation();
+          this.gra.position.y = 0;
+          this.gra.rotation.y = 0;
+          this.gra.position.x = 0;
+          this.gra.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
+          this.gra.animate();
+          //this.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
+          // this.gra.position.x = controls.radio;
+
+      }
+
       this.volume = controls.volume.toFixed(1);
       this.sound.setVolume( this.volume );
       this.goodSound.setVolume( this.volume );
@@ -399,11 +414,16 @@ class TheScene extends WorldScene {
       var bStep = distance/b;
       var mStep = distance/m;
 
-      for(var i=min+bStep;i<max;i+=mStep)
-          this.generateOvoBu(-150,7,i,this.difficulty);
+      //for(var i=min+bStep;i<max;i+=mStep)
+     //     this.generateOvoBu(-150,7,i,this.difficulty);
 
-      for(var i=min+mStep;i<max;i+=mStep)
-          this.generateOvoMa(200,3,i,this.difficulty);
+      //for(var i=min+mStep;i<max;i+=mStep)
+       //   this.generateOvoMa(200,3,i,this.difficulty);
+
+
+      this.gra = new OvoGra();
+      this.gra.animate();
+      this.add(this.gra);
   }
 
   generateSkyBox(){

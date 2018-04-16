@@ -34,15 +34,18 @@ function createGUI (withStats) {
         this.start = function () {
             restart();
         };
+        this.radio = 10;
 
     }
         var gui = new dat.GUI();
         gui.add(GUIcontrols,'volume',0.0,1.0).step(0.1);
         gui.add(GUIcontrols, 'difficulty', {Low: 1, Mid: 2, Extreme: 3});
         gui.add(GUIcontrols, 'start');
+        gui.add(GUIcontrols, 'radio',5,50);
 
 
-        if (withStats)
+
+    if (withStats)
             stats = initStats();
 
 }
