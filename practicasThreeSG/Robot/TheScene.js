@@ -143,7 +143,7 @@ class TheScene extends WorldScene {
       //this.add( this.statusLight );
 
 
-      var spotLight = new THREE.SpotLight( 0xffffff, 0.2 );
+      var spotLight = new THREE.SpotLight( 0xffffff, 0.9 );
       spotLight.target = new THREE.Object3D();
       spotLight.position.set( -50, 100, 0 );
       spotLight.angle = Math.PI / 4;
@@ -329,6 +329,7 @@ class TheScene extends WorldScene {
           this.difficulty = controls.difficulty;
           this.reset();
       }
+      /*
       if(this.gra.radio != controls.radio){
           this.gra.radio = controls.radio;
           this.gra.stopAnimation();
@@ -340,7 +341,7 @@ class TheScene extends WorldScene {
           //this.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
           // this.gra.position.x = controls.radio;
 
-      }
+      }*/
 
       this.volume = controls.volume.toFixed(1);
       this.sound.setVolume( this.volume );
@@ -414,16 +415,16 @@ class TheScene extends WorldScene {
       var bStep = distance/b;
       var mStep = distance/m;
 
-      //for(var i=min+bStep;i<max;i+=mStep)
-     //     this.generateOvoBu(-150,7,i,this.difficulty);
+      for(var i=min+bStep;i<max;i+=mStep)
+          this.generateOvoBu(-150,7,i,this.difficulty);
 
-      //for(var i=min+mStep;i<max;i+=mStep)
-       //   this.generateOvoMa(200,3,i,this.difficulty);
+      for(var i=min+mStep;i<max;i+=mStep)
+          this.generateOvoMa(200,3,i,this.difficulty);
 
 
-      this.gra = new OvoGra();
-      this.gra.animate();
-      this.add(this.gra);
+      //this.gra = new OvoGra();
+      //this.gra.animate();
+      //this.add(this.gra);
   }
 
   generateSkyBox(){

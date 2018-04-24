@@ -123,7 +123,7 @@ function render() {
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
   scene.updatePhysics();
-  //cannonDebugRenderer.update();      Uncomment to display phyisics
+  //cannonDebugRenderer.update();    //  Uncomment to display phyisics
     TWEEN.update();
 
     var views = scene.getActualView();
