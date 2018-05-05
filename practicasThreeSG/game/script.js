@@ -1,6 +1,8 @@
 
 /// Several functions, including the main
 
+Physijs.scripts.worker = '../libs/physijs_worker.js';
+Physijs.scripts.ammo = 'ammo.js';
 /// The scene graph
 scene = null;
 
@@ -21,6 +23,8 @@ rend = true;
 start = false;
 //debug
 cannonDebugRenderer = null;
+
+
 /// It creates the GUI and, optionally, adds statistic information
 /**
  * @param withStats - A boolean to show the statictics or not
@@ -29,19 +33,11 @@ function createGUI (withStats) {
     GUIcontrols = new function () {
         //
 
-        this.difficulty = 1;
-        this.volume = 0.2;
-        this.start = function () {
-            restart();
-        };
-        this.radio = 10;
+
 
     }
         var gui = new dat.GUI();
-        gui.add(GUIcontrols,'volume',0.0,1.0).step(0.1);
-        gui.add(GUIcontrols, 'difficulty', {Low: 1, Mid: 2, Extreme: 3});
-        gui.add(GUIcontrols, 'start');
-        gui.add(GUIcontrols, 'radio',5,50);
+
 
 
 
@@ -120,11 +116,10 @@ function render() {
   requestAnimationFrame(render);
   
   stats.update();
+  scene.simulate();
+    TWEEN.update();
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
-  scene.updatePhysics();
-  //cannonDebugRenderer.update();    //  Uncomment to display phyisics
-    TWEEN.update();
 
     var views = scene.getActualView();
     for(var i = 0; i<views.length;i++){
@@ -171,7 +166,7 @@ $(function () {
     createGUI(true);
 
     scene = new TheScene (renderer.domElement);
-    cannonDebugRenderer = new THREE.CannonDebugRenderer( scene, scene.world );
+
     render();
 
 });

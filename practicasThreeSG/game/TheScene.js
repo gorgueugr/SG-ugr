@@ -3,14 +3,14 @@
 /**
  * @param renderer - The renderer to visualize the scene
  */
-class TheScene extends WorldScene {
+class TheScene extends Physijs.Scene {
   
   constructor (renderer) {
     super();
     
     // Attributes
       //Gravity of physic world
-      this.world.gravity.set(0,-9.82,0);
+      this.setGravity(new THREE.Vector3( 0, -30, 0 ));
 
       this.background = new THREE.Color( 0x777777 );
 
@@ -20,6 +20,8 @@ class TheScene extends WorldScene {
     this.createCamera (renderer);
     this.createModels();
     this.createAudio();
+
+
     //this.generateSkyBox();
 
   }
@@ -151,15 +153,61 @@ class TheScene extends WorldScene {
   }
 
     createMap() {
-       var terrainScene = THREE.Terrain({
-            material: new THREE.MeshLambertMaterial({color:0xff0000})
-       });
+        //var heightmapImage = new Image();
+        //heightmapImage.src = 'imgs/island.jpg';
+
+        var xS = 64, yS = 64;
+        var terrainScene = THREE.Terrain({
+            easing: THREE.Terrain.Linear,
+            frequency: 2.5,
+            heightmap: THREE.Terrain.DiamondSquare,
+            maxHeight: 100,
+            minHeight: -10,
+            steps: 5,
+            useBufferGeometry: false,
+            xSegments: xS,
+            xSize: 1024,
+            ySegments: yS,
+            ySize: 1024,
+        });
+
 
        terrainScene.receiveShadow = true;
-        terrainScene.castShadow = true;
+       terrainScene.castShadow = true;
+
+
+       var ground = new Physijs.HeightfieldMesh(
+           terrainScene.children[0].geometry,
+            new THREE.MeshLambertMaterial({color: 0xff0000}),
+            0 //mass
+        );
+
+        ground.rotation.x = -0.5 * Math.PI;
+       this.add(ground);
+
+       var box = new Physijs.BoxMesh(
+            new THREE.CubeGeometry(50,50,50),
+           new THREE.MeshLambertMaterial({color: 0x0000ff}),
+           10
+       );
+
+       box.position.y = 200;
+       box.castShadow = true;
+
+       this.add(box);
+
+        var water = new THREE.Mesh(
+            new THREE.PlaneBufferGeometry(16384+1024, 16384+1024, 16, 16),
+            new THREE.MeshLambertMaterial({color: 0x006ba0, transparent: true, opacity: 0.6})
+        );
+
+        water.position.y = -5;
+        water.rotation.x = -0.5 * Math.PI;
+        this.add(water);
+
 
         //terrainScene.rotation.x = -0.5 * Math.PI;
-        this.add(terrainScene);
+        //this.add(terrainScene);
     }
 
     createModels() {
