@@ -117,6 +117,7 @@ function render() {
   
   stats.update();
   scene.simulate();
+  scene.update();
     TWEEN.update();
   scene.getCameraControls().update ();
   scene.animate(GUIcontrols);

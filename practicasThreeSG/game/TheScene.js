@@ -13,14 +13,20 @@ class TheScene extends Physijs.Scene {
       this.setGravity(new THREE.Vector3( 0, -30, 0 ));
 
       this.background = new THREE.Color( 0x777777 );
+    this.sunSphere = null;
+      this.water = null;
+      this.terrainScene = null;
 
       this.add(new THREE.AxisHelper(20));
+      this.initSky();
     this.createMap();
-    //this.createLights ();
+      this.createGrass();
+
+      //this.createLights ();
     this.createCamera (renderer);
     this.createModels();
     this.createAudio();
-    this.initSky();
+
 
 
     //this.generateSkyBox();
@@ -98,11 +104,9 @@ class TheScene extends Physijs.Scene {
 
   initSky(){
 
-      //FROM https://threejs.org/examples/?q=sky#webgl_shaders_sky
-      //Lack to implement water shader from :
+      //Sky  FROM https://threejs.org/examples/?q=sky#webgl_shaders_sky
       //
-      // https://github.com/mrdoob/three.js/blob/master/examples/webgl_shaders_ocean2.html
-      //https://github.com/mrdoob/three.js/blob/master/examples/webgl_shaders_ocean.html
+      //Water From https://github.com/mrdoob/three.js/blob/master/examples/webgl_shaders_ocean.html
 
 
 
@@ -123,7 +127,8 @@ class TheScene extends Physijs.Scene {
       var sunLight = new THREE.DirectionalLight({ color: 0xffffff });
       sunLight.castShadow = true;
       sunSphere.add(sunLight);
-      this.add( sunSphere );
+      this.sunSphere = sunSphere;
+      this.add( this.sunSphere );
 
 
 
@@ -133,14 +138,34 @@ class TheScene extends Physijs.Scene {
           mieCoefficient: 0.005,
           mieDirectionalG: 0.8,
           luminance: 1,
-          inclination: 0.26, // elevation / inclination
+          inclination: 0.25, // elevation / inclination
           azimuth: 0.25, // Facing front,
           sun: true
       };
 
+      var uniforms = sky.material.uniforms;
+
+      var pos = { i: 0.5 }; // Start at (0, 0)
+      var tween = new TWEEN.Tween(pos) // Create a new tween that modifies 'coords'.
+          .to({ i: -0.5 }, 10000) // Move to (300, 200) in 1 second.
+          .easing(TWEEN.Easing.Quadratic.InOut)
+          .yoyo( true ) // Use an easing function to make the animation smooth.
+          .repeat( Infinity )
+          .onUpdate(function() { // Called after tween.js updates 'coords'.
+              var theta = Math.PI * ( pos.i - 0.5 );
+              var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
+
+              sunSphere.position.x = distance * Math.cos( phi );
+              sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
+              sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+              sunSphere.visible = effectController.sun;
+              uniforms.sunPosition.value.copy( sunSphere.position );
+
+          })
+          .start(); // Start the tween immediately.
+
       var distance = 400000;
 
-      var uniforms = sky.material.uniforms;
       uniforms.turbidity.value = effectController.turbidity;
       uniforms.rayleigh.value = effectController.rayleigh;
       uniforms.luminance.value = effectController.luminance;
@@ -172,6 +197,14 @@ class TheScene extends Physijs.Scene {
   animate (controls) {
 
 
+  }
+
+  update(){
+      if(this.water != null){
+          console.log("water");
+          this.water.material.uniforms.sunDirection.value.copy( this.sunSphere.position ).normalize();
+          this.water.material.uniforms.time.value += 1.0 / 60.0;
+      }
   }
 
   /// It returns the camera
@@ -206,22 +239,7 @@ class TheScene extends Physijs.Scene {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
   }
-  generateSkyBox(){
-      var materialArray = [];
-      var loader = new THREE.TextureLoader();
-      var textura = loader.load ("imgs/sky.png");
-      for(var i=0;i<7;i++){
-          materialArray.push(new THREE.MeshStandardMaterial({map: textura}));
-          materialArray[i].side = THREE.BackSide;
-
-      }
-      var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
-      var skyboxGeom = new THREE.CubeGeometry( 500, 500, 500, 1, 1, 1 );
-      var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
-      this.add( skybox );
-  }
-
-    createMap() {
+  createMap() {
         //var heightmapImage = new Image();
         //heightmapImage.src = 'imgs/island.jpg';
 
@@ -235,52 +253,119 @@ class TheScene extends Physijs.Scene {
             steps: 5,
             useBufferGeometry: false,
             xSegments: xS,
-            xSize: 1024,
+            xSize: 2048,
             ySegments: yS,
-            ySize: 1024,
+            ySize: 2048,
         });
 
 
        terrainScene.receiveShadow = true;
        terrainScene.castShadow = true;
+      var loader = new THREE.TextureLoader();
+      var textura = loader.load ("imgs/grassGround.jpg");
+        textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
+        textura.repeat = new THREE.Vector2(32,32);
 
+       var material = new THREE.MeshLambertMaterial({map:textura});
 
        var ground = new Physijs.HeightfieldMesh(
            terrainScene.children[0].geometry,
-            new THREE.MeshLambertMaterial({color: 0xff0000}),
+            material,
             0 //mass
         );
 
         ground.rotation.x = -0.5 * Math.PI;
+
+        this.terrainScene = ground;
        this.add(ground);
 
        var box = new Physijs.BoxMesh(
             new THREE.CubeGeometry(50,50,50),
-           new THREE.MeshLambertMaterial({color: 0x0000ff}),
+           new THREE.MeshStandardMaterial({color: 0x0000ff}),
            10
        );
 
        box.position.y = 200;
        box.castShadow = true;
+       box.receiveShadow = true;
 
-       this.add(box);
+       //this.add(box);
 
 
-        var water = new Physijs.PlaneMesh(
-            new THREE.PlaneGeometry(1024, 1024, 16, 16),
-           new THREE.MeshLambertMaterial({color: 0x006ba0, transparent: true, opacity: 0.6})
-            ,0
+        var waterGeometry = new THREE.PlaneGeometry(2048, 2048, 16, 16);
+
+        this.water = new THREE.Water(
+            waterGeometry,
+            {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: new THREE.TextureLoader().load( 'imgs/waternormals.jpg', function ( texture ) {
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                }),
+                alpha: 1.0,
+                sunDirection: this.sunSphere.position.clone().normalize(),
+                sunColor: 0xffffff,
+                waterColor: 0x005BC5,
+                distortionScale:  3.7,
+                fog: this.fog !== undefined
+            }
         );
 
 
-        water.position.y = -5;
-        water.rotation.x = -0.5 * Math.PI;
-        this.add(water);
+        /*
+        var water = new Physijs.PlaneMesh(
+            new THREE.PlaneGeometry(2048, 2048, 16, 16),
+           new THREE.MeshLambertMaterial({color: 0x006ba0, transparent: true, opacity: 0.6})
+            ,0
+        );*/
+
+
+        this.water.position.y = -5;
+        this.water.rotation.x = -0.5 * Math.PI;
+        //this.water = water;
+        this.add(this.water);
 
 
         //terrainScene.rotation.x = -0.5 * Math.PI;
         //this.add(terrainScene);
     }
+
+
+    createGrass(){
+      var geo = new THREE.PlaneGeometry(10,10);
+        geo.applyMatrix(new THREE.Matrix4().makeTranslation(0,5,0));
+        var loader = new THREE.TextureLoader();
+        var textura = loader.load ("imgs/grass2.png");
+
+        var material	= new THREE.MeshPhongMaterial({
+            map		: textura,
+
+            alphaTest	: 0.7,
+        });
+
+        material.side = THREE.DoubleSide;
+
+        var grass = new THREE.Mesh(geo,material);
+        var grass2 = new THREE.Mesh(geo,material);
+
+        //TODO: https://stackoverflow.com/questions/30245990/how-to-merge-two-geometries-or-meshes-using-three-js-r71
+       // var cube = new THREE.Mesh(new THREE.CubeGeometry(8,8,8),material);
+
+        //grass2.rotation.y = Math.PI * 0.5;
+        //grass.add(cube);
+
+        var geo = this.terrainScene.geometry;
+
+        var decoScene = THREE.Terrain.ScatterMeshes(geo, {
+            mesh: grass,
+            w: 64,
+            h: 64,
+            spread: 1,
+            randomness: Math.random
+        });
+
+        this.terrainScene.add(decoScene);
+  }
 
     createModels() {
 
