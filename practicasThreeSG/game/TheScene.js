@@ -16,6 +16,7 @@ class TheScene extends Physijs.Scene {
     this.sunSphere = null;
       this.water = null;
       this.terrainScene = null;
+      this.tree = null;
 
       this.add(new THREE.AxisHelper(20));
       this.initSky();
@@ -121,6 +122,7 @@ class TheScene extends Physijs.Scene {
           new THREE.SphereBufferGeometry( 20000, 16, 8 ),
           new THREE.MeshBasicMaterial( { color: 0xffffff } )
       );
+
       sunSphere.position.y = - 700000;
       sunSphere.visible = true;
 
@@ -181,11 +183,6 @@ class TheScene extends Physijs.Scene {
       sunSphere.visible = effectController.sun;
       uniforms.sunPosition.value.copy( sunSphere.position );
 
-
-
-
-
-
   }
 
   // Public methods
@@ -201,7 +198,6 @@ class TheScene extends Physijs.Scene {
 
   update(){
       if(this.water != null){
-          console.log("water");
           this.water.material.uniforms.sunDirection.value.copy( this.sunSphere.position ).normalize();
           this.water.material.uniforms.time.value += 1.0 / 60.0;
       }
@@ -240,17 +236,18 @@ class TheScene extends Physijs.Scene {
     this.camera.updateProjectionMatrix();
   }
   createMap() {
-        //var heightmapImage = new Image();
-        //heightmapImage.src = 'imgs/island.jpg';
+        var heightmapImage = new Image();
+        heightmapImage.src = 'imgs/heightfield.png';
 
         var xS = 64, yS = 64;
         var terrainScene = THREE.Terrain({
-            easing: THREE.Terrain.Linear,
-            frequency: 2.5,
-            heightmap: THREE.Terrain.DiamondSquare,
+            //easing: THREE.Terrain.Linear,
+            //frequency: 2.5,
+            //heightmap: THREE.Terrain.DiamondSquare,
+            heightmap: heightmapImage,
             maxHeight: 100,
             minHeight: -10,
-            steps: 5,
+            //steps: 5,
             useBufferGeometry: false,
             xSegments: xS,
             xSize: 2048,
@@ -262,11 +259,13 @@ class TheScene extends Physijs.Scene {
        terrainScene.receiveShadow = true;
        terrainScene.castShadow = true;
       var loader = new THREE.TextureLoader();
-      var textura = loader.load ("imgs/grassGround.jpg");
+
+      var textura = loader.load ("imgs/grassGround1.jpg");
         textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
         textura.repeat = new THREE.Vector2(32,32);
 
        var material = new THREE.MeshLambertMaterial({map:textura});
+
 
        var ground = new Physijs.HeightfieldMesh(
            terrainScene.children[0].geometry,
@@ -289,7 +288,7 @@ class TheScene extends Physijs.Scene {
        box.castShadow = true;
        box.receiveShadow = true;
 
-       //this.add(box);
+       this.add(box);
 
 
         var waterGeometry = new THREE.PlaneGeometry(2048, 2048, 16, 16);
@@ -333,38 +332,83 @@ class TheScene extends Physijs.Scene {
 
     createGrass(){
       var geo = new THREE.PlaneGeometry(10,10);
-        geo.applyMatrix(new THREE.Matrix4().makeTranslation(0,5,0));
+        geo.applyMatrix(new THREE.Matrix4().makeTranslation(0,1.5,0));
+
+        var mergedGeometry = new THREE.Geometry();
+
         var loader = new THREE.TextureLoader();
         var textura = loader.load ("imgs/grass2.png");
 
         var material	= new THREE.MeshPhongMaterial({
             map		: textura,
+            alphaTest: 0.2
 
-            alphaTest	: 0.7,
         });
 
         material.side = THREE.DoubleSide;
 
-        var grass = new THREE.Mesh(geo,material);
-        var grass2 = new THREE.Mesh(geo,material);
+        for(var i = 0;i<10;i++){
+                //geo.rotateY(Math.PI * 1 / i);
+                //geo.rotateY(0,Math.PI * 1 / i,0);
+                //geo.translate(i+1,0,j+1);
+            geo.translate(0,0,i+1);
+            mergedGeometry.merge(geo);
+        }
+
+        var grass = new THREE.Mesh(mergedGeometry,material);
+
 
         //TODO: https://stackoverflow.com/questions/30245990/how-to-merge-two-geometries-or-meshes-using-three-js-r71
        // var cube = new THREE.Mesh(new THREE.CubeGeometry(8,8,8),material);
 
-        //grass2.rotation.y = Math.PI * 0.5;
-        //grass.add(cube);
 
-        var geo = this.terrainScene.geometry;
+        var loader = new THREE.OBJLoader();
 
-        var decoScene = THREE.Terrain.ScatterMeshes(geo, {
-            mesh: grass,
-            w: 64,
-            h: 64,
-            spread: 1,
-            randomness: Math.random
-        });
+// load a resource
+        var that = this;
+        loader.load(
+            // resource URL
+            'obj/lowpolytree.obj',
+            // called when resource is loaded
+            function ( object ) {
 
-        this.terrainScene.add(decoScene);
+               that.tree = object;
+               that.addTrees();
+
+            },
+            // called when loading is in progresses
+            function ( xhr ) {
+            },
+            // called when loading has errors
+            function ( error ) {
+
+                console.log( 'An error happened' );
+
+            }
+        );
+
+  }
+
+  addTrees(){
+      var geoTerrain = this.terrainScene.geometry;
+
+      this.tree.position.y = 10;
+      this.tree.updateMatrix();
+      this.tree.scale.x = 10;
+      this.tree.scale.y = 10;
+      this.tree.scale.z = 10;
+
+
+      var decoScene = THREE.Terrain.ScatterMeshes(geoTerrain, {
+          smoothSpread:0,
+          mesh: this.tree,
+          w: 64,
+          h: 64,
+          spread: 0.02,
+          randomness: Math.random
+      });
+
+      this.terrainScene.add(decoScene);
   }
 
     createModels() {
