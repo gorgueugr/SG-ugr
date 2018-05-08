@@ -20,8 +20,10 @@ class TheScene extends Physijs.Scene {
 
       this.add(new THREE.AxisHelper(20));
       this.initSky();
-    this.createMap();
-      this.createGrass();
+
+      this.createMap('imgs/prueba.png','imgs/grassGround1.jpg');
+      this.createMap('imgs/prueba2.png','imgs/grassGround.jpg');
+      //this.createGrass();
 
       //this.createLights ();
     this.createCamera (renderer);
@@ -235,9 +237,9 @@ class TheScene extends Physijs.Scene {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
   }
-  createMap() {
+  createMap(ruta,textura) {
         var heightmapImage = new Image();
-        heightmapImage.src = 'imgs/heightfield.png';
+        heightmapImage.src = ruta;
 
         var xS = 64, yS = 64;
         var terrainScene = THREE.Terrain({
@@ -260,7 +262,7 @@ class TheScene extends Physijs.Scene {
        terrainScene.castShadow = true;
       var loader = new THREE.TextureLoader();
 
-      var textura = loader.load ("imgs/grassGround1.jpg");
+      var textura = loader.load (textura);
         textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
         textura.repeat = new THREE.Vector2(32,32);
 

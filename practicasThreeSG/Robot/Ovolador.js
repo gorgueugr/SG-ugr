@@ -217,3 +217,78 @@ class OvoGra extends THREE.Object3D{
     }
 
 }
+
+class palo extends THREE.Object3D{
+    constructor(){
+        super();
+        this.material = null;
+        this.model = null;
+        this.size = 1;
+        this.radio = 1;
+        this.height = 15;
+        this.tween = null;
+        this.tweenB = null;
+
+
+        this.add(this.createModel());
+    }
+    createModel(){
+
+        //this.size = 1;
+
+        //var loader = new THREE.TextureLoader();
+        //var texture =  loader.load ( 'imgs/good.jpg' );
+
+        this.material = new THREE.MeshBasicMaterial({color:0x00ff00});
+
+
+        this.model = new THREE.Mesh(
+            new THREE.CylinderGeometry(this.radio,this.radio,this.height,16,1,false),
+            this.material
+        );
+
+        this.add(this.model);
+
+        /*
+        this.model.position.y = 0;
+        this.model.rotation.y = 0;
+        */
+        this.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
+        //this.model.position.x = this.radio;
+
+        return this.model;
+    }
+
+    animate(){
+        var orig = {z:-10,y:0 , r:0 };
+        var pos = { z:-10,y:0 , r:0 };
+        var dest = { z:16,y:20 , r:50 };
+
+        this.tween = new TWEEN.Tween(pos).to(dest, 4000);
+        this.tweenB =  new TWEEN.Tween(pos).to(orig, 4000);
+        var that = this;
+        this.tween.onUpdate(function(){
+            //that.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
+            //that.model.position.x = that.radio;
+            that.position.z = pos.z;
+            that.position.y = pos.y;
+
+            that.rotation.x = pos.r;
+        });
+        this.tweenB.onUpdate(function () {
+            //that.model.applyMatrix(new THREE.Matrix4().makeTranslation(this.radio,0,0));
+            //that.model.position.x = that.radio;
+            that.position.z = pos.z;
+            that.position.y = pos.y;
+            that.rotation.x = pos.r;
+        });
+        this.tween.chain(this.tweenB);
+        this.tweenB.chain(this.tween);
+        this.tween.start();
+    }
+    stopAnimation(){
+        this.gra.tween.stop();
+        this.gra.tweenB.stop();
+    }
+
+}
