@@ -18,11 +18,15 @@ class TheScene extends Physijs.Scene {
       this.terrainScene = null;
       this.tree = null;
 
+      this.clock = new THREE.Clock();
+      this.mixers = [];
+
+
       this.add(new THREE.AxisHelper(20));
       this.initSky();
 
       this.createMap('imgs/prueba.png','imgs/grassGround1.jpg');
-      this.createMap('imgs/prueba2.png','imgs/grassGround.jpg');
+      //this.createMap('imgs/prueba2.png','imgs/grassGround.jpg');
       //this.createGrass();
 
       //this.createLights ();
@@ -149,7 +153,7 @@ class TheScene extends Physijs.Scene {
 
       var uniforms = sky.material.uniforms;
 
-      var pos = { i: 0.5 }; // Start at (0, 0)
+      /*var pos = { i: 0.5 }; // Start at (0, 0)
       var tween = new TWEEN.Tween(pos) // Create a new tween that modifies 'coords'.
           .to({ i: -0.5 }, 10000) // Move to (300, 200) in 1 second.
           .easing(TWEEN.Easing.Quadratic.InOut)
@@ -166,7 +170,7 @@ class TheScene extends Physijs.Scene {
               uniforms.sunPosition.value.copy( sunSphere.position );
 
           })
-          .start(); // Start the tween immediately.
+          .start(); // Start the tween immediately.*/
 
       var distance = 400000;
 
@@ -202,6 +206,10 @@ class TheScene extends Physijs.Scene {
       if(this.water != null){
           this.water.material.uniforms.sunDirection.value.copy( this.sunSphere.position ).normalize();
           this.water.material.uniforms.time.value += 1.0 / 60.0;
+      }
+
+      for ( var i = 0; i < this.mixers.length; i ++ ) {
+          this.mixers[ i ].update( this.clock.getDelta() );
       }
   }
 
@@ -240,6 +248,8 @@ class TheScene extends Physijs.Scene {
   createMap(ruta,textura) {
         var heightmapImage = new Image();
         heightmapImage.src = ruta;
+
+        //TODO: Aqui hay algo raro que cuando cargas la prueba tienes qe recargar la pagina para que se vea el map
 
         var xS = 64, yS = 64;
         var terrainScene = THREE.Terrain({
@@ -414,7 +424,10 @@ class TheScene extends Physijs.Scene {
   }
 
     createModels() {
+        var player = new Player(this);
 
+        //player.model.position.y = 200;
+        //this.add(player.model);
     }
 }
 
