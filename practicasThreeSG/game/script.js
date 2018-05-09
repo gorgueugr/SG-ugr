@@ -138,7 +138,7 @@ function render() {
   scene.simulate();
   scene.update();
     TWEEN.update();
-  scene.getCameraControls().update ();
+  //scene.getCameraControls().update ();
   scene.animate(GUIcontrols);
 
     var views = scene.getActualView();
