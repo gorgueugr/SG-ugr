@@ -17,6 +17,7 @@ class TheScene extends Physijs.Scene {
       this.water = null;
       this.terrainScene = null;
       this.tree = null;
+      this.player = null;
 
       this.clock = new THREE.Clock();
       this.mixers = [];
@@ -203,11 +204,17 @@ class TheScene extends Physijs.Scene {
   }
 
   update(){
+      //Actualizar normales del agua
       if(this.water != null){
           this.water.material.uniforms.sunDirection.value.copy( this.sunSphere.position ).normalize();
           this.water.material.uniforms.time.value += 1.0 / 60.0;
       }
 
+      //Para que el player no rote dentro de la esfera
+      if(this.player.physic != null)
+          this.player.physic.__dirtyRotation = true;
+
+      //Para las animaciones
       for ( var i = 0; i < this.mixers.length; i ++ ) {
           this.mixers[ i ].update( this.clock.getDelta() );
       }
@@ -292,15 +299,15 @@ class TheScene extends Physijs.Scene {
 
        var box = new Physijs.BoxMesh(
             new THREE.CubeGeometry(50,50,50),
-           new THREE.MeshStandardMaterial({color: 0x0000ff}),
+            new THREE.MeshStandardMaterial({color: 0x0000ff}),
            10
-       );
+        );
 
        box.position.y = 200;
        box.castShadow = true;
        box.receiveShadow = true;
 
-       this.add(box);
+       //this.add(box);
 
 
         var waterGeometry = new THREE.PlaneGeometry(2048, 2048, 16, 16);
@@ -424,10 +431,39 @@ class TheScene extends Physijs.Scene {
   }
 
     createModels() {
-        var player = new Player(this);
+        this.player = new Player(this);
 
+        //TODO: Check this https://github.com/Akimoto873/WebGL-Platformer/blob/master/Platform/WebContent/js/charController.js
         //player.model.position.y = 200;
         //this.add(player.model);
+    }
+
+
+    forward(){
+
+      var forceVector = {x:0,y:0,z:10};
+
+      //TODO: Revise this
+      if(this.player.physic != null)
+          this.player.physic.setLinearVelocity(
+              new THREE.Vector3(
+                  (forceVector.z)*Math.sin(this.scenicCamera.rotation.y) + (forceVector.x)*Math.cos(this.scenicCamera.rotation.y),
+                  0,
+                  (forceVector.z)*Math.cos(this.scenicCamera.rotation.y) - (forceVector.x)*Math.sin(this.scenicCamera.rotation.y)
+              )
+          );
+
+
+    }
+
+    backward(){
+        if(this.player.physic != null)
+        this.player.physic.setLinearVelocity({x:0,y:0,z:-10});
+    }
+    stopPlayer(){
+        if(this.player.physic != null)
+            this.player.physic.setLinearVelocity({x:0,y:0,z:0});
+
     }
 }
 
