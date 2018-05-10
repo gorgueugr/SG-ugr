@@ -1,6 +1,5 @@
-class Mapa extends Physijs.Scene{
+class Mapa{
     constructor (renderer) {
-        super();
 
         // Attributes
         //Gravity of physic world
