@@ -22,8 +22,6 @@ class TheScene extends Physijs.Scene {
       this.clock = new THREE.Clock();
       this.mixers = [];
 
-      this.createModels();
-
       this.add(new THREE.AxisHelper(20));
       this.initSky();
       this.createCamera (renderer);
@@ -33,8 +31,8 @@ class TheScene extends Physijs.Scene {
 
       //this.createLights ();
 
-      this.mapa = new Mapa();
-      this.add(this.mapa);
+      this.mapa = new Mapa(this);
+      //this.add(this.mapa);
     this.createCamera (renderer);
     this.createModels();
     this.createAudio();
@@ -444,7 +442,7 @@ class TheScene extends Physijs.Scene {
     createModels() {
         this.player = new Player(this);
 
-        this.actualView = this.player.view;
+        //this.actualView = this.player.view;
 
         //TODO: Check this https://github.com/Akimoto873/WebGL-Platformer/blob/master/Platform/WebContent/js/charController.js
         //player.model.position.y = 200;

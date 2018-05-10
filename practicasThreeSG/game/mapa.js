@@ -1,10 +1,5 @@
-class Mapa extends Physijs.Scene{
-    constructor (renderer) {
-        super();
-
-        // Attributes
-        //Gravity of physic world
-        this.setGravity(new THREE.Vector3( 0, -30, 0 ));
+class Mapa{
+    constructor (scene) {
 
         this.background = new THREE.Color( 0x777777 );
         this.water = null;
@@ -32,9 +27,9 @@ class Mapa extends Physijs.Scene{
         this.box_bosque = null;
         this.box_green = null;
 
-        this.createMap();
+        this.createMap(scene);
     }
-    iniciaZonas(){
+    iniciaZonas(scene){
 
         ///Inicializacion calle
         var heightmap_calle = new Image();
@@ -73,7 +68,7 @@ class Mapa extends Physijs.Scene{
         );
         this.ground_calle.rotation.x = -0.5 * Math.PI;
 
-        this.add(this.ground_calle);
+        scene.add(this.ground_calle);
 
         this.box_calle = new Physijs.BoxMesh(
             new THREE.CubeGeometry(50,50,50),
@@ -85,16 +80,16 @@ class Mapa extends Physijs.Scene{
         this.box_calle.castShadow = true;
         this.box_calle.receiveShadow = true;
 
-        this.add(this.box_calle);
+        scene.add(this.box_calle);
 
     }
 
-    createMap() {
-        this.iniciaZonas();
-        //this.creaAgua();
+    createMap(scene) {
+        this.iniciaZonas(scene);
+        //this.creaAgua(scene);
 
     }
-    creaAgua(){
+    creaAgua(scene){
         var waterGeometry = new THREE.PlaneGeometry(2048, 2048, 16, 16);
 
         this.water = new THREE.Water(
@@ -126,6 +121,6 @@ class Mapa extends Physijs.Scene{
         this.water.position.y = -5;
         this.water.rotation.x = -0.5 * Math.PI;
         //this.water = water;
-        this.add(this.water);
+        scene.add(this.water);
     }
 }

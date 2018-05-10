@@ -91,6 +91,10 @@ function onkeyDown(event) {
         case 68: // d
             scene.right();
             break;
+        case 67:
+            scene.changeCamera();
+            break;
+
     }
 }
 

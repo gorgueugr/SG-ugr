@@ -25,7 +25,7 @@ class Player{
         // model
         var loader = new THREE.FBXLoader();
         var that = this;
-        loader.load( 'obj/Drive.fbx', function ( object ) {
+        loader.load( 'obj/Walking.fbx', function ( object ) {
 
             that.test(scene,object);
             console.log("Loading model");
@@ -87,7 +87,7 @@ class Player{
         phy.scale.x = 0.125;
         phy.scale.y = 0.125;
         phy.scale.z = 0.125;
-        phy.position.y = 200;
+        phy.position.y = 100;
         phy.add(this.camera);
         this.camera.lookAt(phy.position);
         scene.add(phy);
