@@ -63,7 +63,7 @@ class Mapa extends Physijs.Scene{
         textura_calle.wrapS = textura_calle.wrapT = THREE.RepeatWrapping;
         textura_calle.repeat = new THREE.Vector2(32,32);
 
-        this.material_calle = new THREE.MeshLambertMaterial({map:textura_calle});
+        this.material_calle = new THREE.MeshPhongMaterial({map:textura_calle});
 
 
         this.ground_calle = new Physijs.HeightfieldMesh(
