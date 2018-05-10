@@ -4,9 +4,11 @@ class Player{
         this.model = null;
         this.physic = null;
         this.camera = null;
-
+        this.mixer = null;
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000);
         this.camera.position.set (0,500,1000);
+
+        this.vectorObject = null;
 
         this.view = [{
             left: 0,
@@ -15,6 +17,8 @@ class Player{
             height: 1.0,
             camera: this.camera
         }];
+        this.scene = scene;
+        this.animations = {};
 
         this.loadModel(scene);
 
@@ -25,75 +29,125 @@ class Player{
         // model
         var loader = new THREE.FBXLoader();
         var that = this;
-        loader.load( 'obj/Walking.fbx', function ( object ) {
-
-            that.test(scene,object);
-            console.log("Loading model");
-
-
-
-        },
+        var player = null;
+        loader.load('obj/Ybot.fbx' , function ( object ) {
+            player = object;
+            //that.test(scene,object);
+            },
             function ( object ) {
-
-                console.log("Aqi");
-
-
-
+                //console.log("Aqi");
             },
             function ( msg ) {
-
-                console.log("Error");
+                console.log("Error cargando modelo");
                 console.log(msg);
-
-
-
             });
+
+        loader.load('obj/Idle.fbx' , function ( object ) {
+                that.addAnimation("idle",object);
+                //that.test(scene,object);
+            },
+            function ( object ) {
+                //console.log("Aqi");
+            },
+            function ( msg ) {
+                console.log("Error cargando modelo");
+                console.log(msg);
+            });
+
+        loader.load('obj/Walking.fbx' , function ( object ) {
+                //player = object;
+                that.addAnimation("walking",object);
+                //that.test(scene,object);
+                that.addPlayer(scene,player);
+            },
+            function ( object ) {
+                //console.log("Aqi");
+            },
+            function ( msg ) {
+                console.log("Error cargando modelo");
+                console.log(msg);
+            });
+
+
+
+
     }
 
-    test(scene,object){
+    addPlayer(scene,object){
+        var modelBbox = new THREE.Box3();
+        modelBbox.setFromObject( object );
 
+        var height = modelBbox.max.y - modelBbox.min.y;
 
+        object.translateY(-height/2 - 10);
+        object.rotation.y = Math.PI;
 
-
-        console.log(object);
-        var temp =  new THREE.CylinderGeometry( 5, 5, 20, 32 );
-        temp.translate(0,10,0);
+        var geo =  new THREE.CylinderGeometry( 20, 20, height, 32 );
+        //geo.translate(0,height/2,0);
 
         var phy = new Physijs.CapsuleMesh(
-            temp,
-            new THREE.MeshBasicMaterial(),
+            geo,
+            new THREE.MeshBasicMaterial({opacity:0,transparent: true }),
             100
         );
 
         phy.add(object);
         this.physic = phy;
-        object.position.y = -10;
-        object.mixer = new THREE.AnimationMixer( object );
-        scene.mixers.push( object.mixer );
-        console.log("Object");
 
-        console.log(object);
-        var action = object.mixer.clipAction( object.animations[ 0 ] );
-        action.play();
-        //console.log("Action");
+        this.mixer = new THREE.AnimationMixer( object );
+        scene.mixers.push( this.mixer );
 
-        //console.log(action);
-        /*object.traverse( function ( child ) {
+
+        phy.traverse( function ( child ) {
             if ( child.isMesh ) {
                 child.castShadow = true;
                 child.receiveShadow = true;
             }
-        } );*/
+        } );
+
+        phy.castShadow = true;
+        phy.receiveShadow = true;
+
+
+        var vector = new THREE.Object3D();
+        phy.add(vector);
+        vector.position.z = 10;
+        this.vectorObject = vector;
+
         phy.scale.x = 0.125;
         phy.scale.y = 0.125;
         phy.scale.z = 0.125;
-        phy.position.y = 100;
+        phy.position.y = 300;
+        phy.position.z = 100;
+
         phy.add(this.camera);
         this.camera.lookAt(phy.position);
         scene.add(phy);
+        this.animate("idle");
+
 
         //scene.add( object );
 
+    }
+
+    addAnimation(name,object){
+        if(object == null){
+            console.log("animacion null");
+            return;
+        }
+        this.animations[name] = object.animations[0];
+    }
+
+    animate(name){
+        //this.stopAnimation();
+        if(this.animations[name] == null)
+            return;
+
+        var action = this.mixer.clipAction( this.animations[name] );
+        action.play();
+    }
+    stopAnimation(){
+        this.mixer.stopAllAction();
     }
 
 }

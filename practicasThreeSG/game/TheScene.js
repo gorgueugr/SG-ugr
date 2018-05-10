@@ -456,41 +456,56 @@ class TheScene extends Physijs.Scene {
 
 
         //TODO: Revise this
-      if(this.player.physic != null) {
-          this.player.physic.applyCentralImpulse({x: 0, y: 0, z: -50});
-          this.player.camera.updateMatrixWorld();
+        if(this.player.physic == null)
+            return;
 
           var vector = new THREE.Vector3();
-          vector.setFromMatrixPosition( this.player.camera.matrixWorld );
+          vector.setFromMatrixPosition( this.player.vectorObject.matrixWorld );
 
-          console.log(
-              vector ,
-          this.player.physic.position);
+        var playerPos = this.player.physic.position.clone();
+        var distance = new THREE.Vector3();
 
-      }
+        distance.subVectors( playerPos ,vector );
+        distance.normalize();
+        distance.multiplyScalar(50);
+
+        this.player.physic.setLinearVelocity(distance);
+
+        console.log(distance);
+
+        this.player.animate("walking");
 
     }
 
     backward(){
-        if(this.player.physic != null)
-        this.player.physic.applyCentralImpulse({x:0,y:0,z:50});
+        if(this.player.physic == null)
+            return;
+
+        this.player.physic.setLinearVelocity({x:0,y:0,z:50});
     }
 
     right(){
-        if(this.player.physic != null)
-            this.player.physic.rotation.y += -Math.PI * 0.25;
+        if(this.player.physic == null)
+            return;
+
+        this.player.physic.rotation.y += -Math.PI * 0.25;
     }
 
     left(){
-        if(this.player.physic != null)
-            this.player.physic.rotation.y += Math.PI * 0.25;
+        if(this.player.physic == null)
+            return;
+
+        this.player.physic.rotation.y += Math.PI * 0.25;
     }
 
     stopPlayer(){
-        if(this.player.physic != null){
-            this.player.physic.setAngularVelocity({x:0,y:0,z:0});
-            this.player.physic.setLinearVelocity({x:0,y:0,z:0});
-        }
+        if(this.player.physic == null)
+            return;
+
+        this.player.physic.setAngularVelocity({x:0,y:0,z:0});
+        this.player.physic.setLinearVelocity({x:0,y:0,z:0});
+        this.player.stopAnimation();
+        this.player.animate("idle");
 
     }
 }
