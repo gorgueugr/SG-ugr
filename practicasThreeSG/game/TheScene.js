@@ -28,11 +28,15 @@ class TheScene extends Physijs.Scene {
       this.initSky();
       this.createCamera (renderer);
 
-      this.createMap('imgs/prueba.png','imgs/grassGround1.jpg');
-      //this.createMap('imgs/prueba2.png','imgs/grassGround.jpg');
+      //this.createMap('imgs/prueba.png','imgs/grassGround1.jpg');
       //this.createGrass();
 
       //this.createLights ();
+
+      this.mapa = new Mapa();
+      this.add(this.mapa);
+    this.createCamera (renderer);
+    this.createModels();
     this.createAudio();
 
 
@@ -52,12 +56,16 @@ class TheScene extends Physijs.Scene {
   createCamera (renderer) {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 5000);
     this.camera.position.set (500,750,500);
-
     var look = new THREE.Vector3 (0,0,0);
     this.camera.lookAt(look);
 
     this.scenicCamera = this.camera;
 
+    this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
+    this.trackballControls.rotateSpeed = 5;
+    this.trackballControls.zoomSpeed = -2;
+    this.trackballControls.panSpeed = 0.5;
+    this.trackballControls.target = look;
 
     this.view = [{
         left: 0,
@@ -67,8 +75,9 @@ class TheScene extends Physijs.Scene {
         camera: this.scenicCamera
     }];
 
-      this.add(this.camera);
+      this.actualView = this.view;
 
+      this.add(this.camera);
   }
   
   /// It creates lights and adds them to the graph
@@ -235,9 +244,17 @@ class TheScene extends Physijs.Scene {
   }
 
   getActualView(){
-    return this.player.view;
+    return this.actualView;
   }
-
+  
+  /// It returns the camera controls
+  /**
+   * @return The camera controls
+   */
+  getCameraControls () {
+    return this.trackballControls;
+  }
+  
   /// It updates the aspect ratio of the camera
   /**
    * @param anAspectRatio - The new aspect ratio for the camera
@@ -246,7 +263,6 @@ class TheScene extends Physijs.Scene {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
   }
-
   createMap(ruta,textura) {
         var heightmapImage = new Image();
         heightmapImage.src = ruta;
@@ -294,9 +310,9 @@ class TheScene extends Physijs.Scene {
 
        var box = new Physijs.BoxMesh(
             new THREE.CubeGeometry(50,50,50),
-            new THREE.MeshStandardMaterial({color: 0x0000ff}),
+           new THREE.MeshStandardMaterial({color: 0x0000ff}),
            10
-        );
+       );
 
        box.position.y = 200;
        box.castShadow = true;
