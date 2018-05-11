@@ -1,10 +1,7 @@
 class Mapa{
     constructor (scene) {
 
-        this.background = new THREE.Color( 0x777777 );
-        this.water = null;
-        this.terrainScene = null;
-        this.tree = null;
+        this.heightmap_calle = null;
 
 
         this.material_calle = null;
@@ -29,27 +26,38 @@ class Mapa{
 
         this.createMap(scene);
     }
-    iniciaZonas(scene){
 
+    loadImage(scene){
         ///Inicializacion calle
         var heightmap_calle = new Image();
+        var that = this;
+        heightmap_calle.onload = function () {
+            that.iniciaZonas(scene);
+        };
         heightmap_calle.src = 'imgs/prueba.png';
+        this.heightmap_calle = heightmap_calle;
+    }
+    iniciaZonas(scene){
+
+
 
         var xS = 64, yS = 64;
         this.terreno_calle = THREE.Terrain({
-            //easing: THREE.Terrain.Linear,
-            //frequency: 2.5,
-            //heightmap: THREE.Terrain.DiamondSquare,
-            heightmap: heightmap_calle,
-            maxHeight: 100,
-            minHeight: -10,
-            //steps: 5,
+            easing: THREE.Terrain.Linear,
             useBufferGeometry: false,
+            frequency: 2.5,
+            //heightmap: THREE.Terrain.DiamondSquare,
+            heightmap:  this.heightmap_calle,
+            material: new THREE.MeshBasicMaterial({color: 0x5566aa}),
+            maxHeight: 100,
+            minHeight: -100,
+            steps: 1,
             xSegments: xS,
-            xSize: 2048,
+            xSize: 1024,
             ySegments: yS,
-            ySize: 2048,
+            ySize: 1024,
         });
+
         this.terreno_calle.receiveShadow = true;
         this.terreno_calle.castShadow = true;
         var loader = new THREE.TextureLoader();
@@ -69,6 +77,9 @@ class Mapa{
         this.ground_calle.rotation.x = -0.5 * Math.PI;
         scene.add(this.ground_calle);
 
+        console.log("mapa añadido");
+        console.log(this.terreno_calle);
+
         this.box_calle = new Physijs.BoxMesh(
             new THREE.CubeGeometry(50,50,50),
             new THREE.MeshStandardMaterial({color: 0x0000ff}),
@@ -84,7 +95,8 @@ class Mapa{
     }
 
     createMap(scene) {
-        this.iniciaZonas(scene);
+        this.loadImage(scene);
+        //this.iniciaZonas(scene);
         //this.creaAgua(scene);
 
     }

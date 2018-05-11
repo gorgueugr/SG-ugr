@@ -90,7 +90,7 @@ class Player{
         var phy = new Physijs.CapsuleMesh(
             geo,
             new THREE.MeshBasicMaterial({opacity:1,transparent: false }),
-            100
+            10000
         );
 
         phy.receiveShadow = true;
@@ -123,8 +123,11 @@ class Player{
         phy.scale.x = 0.125;
         phy.scale.y = 0.125;
         phy.scale.z = 0.125;
-        phy.position.y = 200;
+        phy.position.y = 300;
         phy.position.z = 100;
+
+        console.log("Player:");
+        console.log(object);
 
         phy.add(this.camera);
         this.camera.lookAt(phy.position);
@@ -150,8 +153,8 @@ class Player{
         if(this.animations[name] == null)
             return;
 
-        var action = this.mixer.clipAction( this.animations[name] );
-        action.play();
+        this.mixer.clipAction( this.animations[name] ).play();
+
     }
 
     stopAnimation(){

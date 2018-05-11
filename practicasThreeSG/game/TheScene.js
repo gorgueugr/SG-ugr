@@ -100,8 +100,6 @@ class TheScene extends Physijs.Scene {
       spotLight.shadow.camera.near = 1;
       spotLight.shadow.camera.far = 1;
       this.add( spotLight );
-
-
   }
 
     changeCamera(){
@@ -141,7 +139,15 @@ class TheScene extends Physijs.Scene {
       sunLight.shadow.mapSize.height = 512; // default
       sunLight.shadow.camera.near = 0.5;    // default
       sunLight.shadow.camera.far = 500;     // default
-      sunSphere.add(sunLight);
+      //sunSphere.add(sunLight);
+
+      sunSphere.castShadow = true;
+      sunSphere.receiveShadow = true;
+
+      //var helper  = new THREE.DirectionalLightHelper(sunLight,100,0xff0000);
+      //this.add(helper);
+      this.add(sunLight);
+
       this.sunSphere = sunSphere;
       this.add( this.sunSphere );
 
@@ -155,7 +161,7 @@ class TheScene extends Physijs.Scene {
           luminance: 1,
           inclination: 0.25, // elevation / inclination
           azimuth: 0.25, // Facing front,
-          sun: true
+          sun: false
       };
 
       var uniforms = sky.material.uniforms;
@@ -194,6 +200,7 @@ class TheScene extends Physijs.Scene {
       sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
       sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
       sunSphere.visible = effectController.sun;
+      sunLight.position.copy(sunSphere.position);
       uniforms.sunPosition.value.copy( sunSphere.position );
 
   }
