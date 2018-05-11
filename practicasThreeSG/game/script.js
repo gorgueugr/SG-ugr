@@ -69,27 +69,26 @@ function initStats() {
 function onkeyDown(event) {
     var keyCode = event.keyCode;
     //keyCode = keyCode.toLowerCase();
-    console.log("Key down" + keyCode);
+    //console.log("Key down" + keyCode);
     switch (keyCode) {
         case 38: // up
         case 87: // w
-            console.log("foward");
-            scene.forward();
+            scene.player.forward();
             break;
 
         case 40: // down
         case 83: // s
-            scene.backward();
+            scene.player.backward();
             break;
 
         case 37: // left
         case 65: // a
-            scene.left();
+            scene.player.left();
             break;
 
         case 39: // right
         case 68: // d
-            scene.right();
+            scene.player.right();
             break;
         case 67:
             scene.changeCamera();
@@ -103,11 +102,11 @@ function onkeyUp(event) {
     var keyCode = event.code;
     //keyCode = keyCode.toLowerCase();
     //console.log(keyCode);
-    console.log("Key up" + keyCode);
+    //console.log("Key up" + keyCode);
 
     switch (keyCode) {
         default:
-            scene.stopPlayer();
+            scene.player.stopPlayer();
          break;
     }
 }
@@ -187,6 +186,13 @@ $(function () {
     //window.addEventListener ("resize", onWindowResize);
     window.addEventListener ("keydown", onkeyDown, true);
     window.addEventListener ("keyup", onkeyUp, true);
+
+
+    //Pointer
+
+    var havePointerLock = 'pointerLockElement' in document ||
+        'mozPointerLockElement' in document ||
+        'webkitPointerLockElement' in document;
 
 
     createGUI(true);

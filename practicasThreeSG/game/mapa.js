@@ -67,7 +67,6 @@ class Mapa{
             0 //mass
         );
         this.ground_calle.rotation.x = -0.5 * Math.PI;
-
         scene.add(this.ground_calle);
 
         this.box_calle = new Physijs.BoxMesh(

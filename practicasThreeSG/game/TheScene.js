@@ -33,7 +33,6 @@ class TheScene extends Physijs.Scene {
 
       this.mapa = new Mapa(this);
       //this.add(this.mapa);
-    this.createCamera (renderer);
     this.createModels();
     this.createAudio();
 
@@ -58,12 +57,6 @@ class TheScene extends Physijs.Scene {
     this.camera.lookAt(look);
 
     this.scenicCamera = this.camera;
-
-    this.trackballControls = new THREE.TrackballControls (this.camera, renderer);
-    this.trackballControls.rotateSpeed = 5;
-    this.trackballControls.zoomSpeed = -2;
-    this.trackballControls.panSpeed = 0.5;
-    this.trackballControls.target = look;
 
     this.view = [{
         left: 0,
@@ -142,8 +135,12 @@ class TheScene extends Physijs.Scene {
       sunSphere.position.y = - 700000;
       sunSphere.visible = true;
 
-      var sunLight = new THREE.DirectionalLight({ color: 0xffffff });
+      var sunLight =   new THREE.DirectionalLight({ color: 0xffff99 });
       sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 512;  // default
+      sunLight.shadow.mapSize.height = 512; // default
+      sunLight.shadow.camera.near = 0.5;    // default
+      sunLight.shadow.camera.far = 500;     // default
       sunSphere.add(sunLight);
       this.sunSphere = sunSphere;
       this.add( this.sunSphere );
@@ -219,9 +216,10 @@ class TheScene extends Physijs.Scene {
           this.water.material.uniforms.time.value += 1.0 / 60.0;
       }
 
-      //Para que el player no rote dentro de la esfera
+      //Para que el player no rote dentro de las fisicas
       if(this.player.physic != null)
           this.player.physic.__dirtyRotation = true;
+
 
       //Para las animaciones
       for ( var i = 0; i < this.mixers.length; i ++ ) {
@@ -449,65 +447,6 @@ class TheScene extends Physijs.Scene {
         //this.add(player.model);
     }
 
-
-    forward(){
-      var forceVector = {x:0,y:0,z:10};
-
-
-
-        //TODO: Revise this
-        if(this.player.physic == null)
-            return;
-
-          var vector = new THREE.Vector3();
-          vector.setFromMatrixPosition( this.player.vectorObject.matrixWorld );
-
-        var playerPos = this.player.physic.position.clone();
-        var distance = new THREE.Vector3();
-
-        distance.subVectors( playerPos ,vector );
-        distance.normalize();
-        distance.multiplyScalar(50);
-
-        this.player.physic.setLinearVelocity(distance);
-
-        console.log(distance);
-
-        this.player.animate("walking");
-
-    }
-
-    backward(){
-        if(this.player.physic == null)
-            return;
-
-        this.player.physic.setLinearVelocity({x:0,y:0,z:50});
-    }
-
-    right(){
-        if(this.player.physic == null)
-            return;
-
-        this.player.physic.rotation.y += -Math.PI * 0.25;
-    }
-
-    left(){
-        if(this.player.physic == null)
-            return;
-
-        this.player.physic.rotation.y += Math.PI * 0.25;
-    }
-
-    stopPlayer(){
-        if(this.player.physic == null)
-            return;
-
-        this.player.physic.setAngularVelocity({x:0,y:0,z:0});
-        this.player.physic.setLinearVelocity({x:0,y:0,z:0});
-        this.player.stopAnimation();
-        this.player.animate("idle");
-
-    }
 }
 
 
