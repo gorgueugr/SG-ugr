@@ -143,7 +143,7 @@ class Mapa {
     createMap(scene) {
         this.loadImage(scene);
         //this.iniciaZonas(scene);
-        this.creaAgua(scene);
+        //this.creaAgua(scene);
 
 
 

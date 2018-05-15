@@ -30,7 +30,7 @@ class TheScene extends Physijs.Scene {
       //this.createGrass();
 
       //this.createLights ();
-
+        this.createWater();
       this.mapa = new Mapa(this);
       //this.add(this.mapa);
     this.createModels();
@@ -266,63 +266,7 @@ class TheScene extends Physijs.Scene {
     this.camera.aspect = anAspectRatio;
     this.camera.updateProjectionMatrix();
   }
-  createMap(ruta,textura) {
-        var heightmapImage = new Image();
-        heightmapImage.src = ruta;
-
-        //TODO: Aqui hay algo raro que cuando cargas la prueba tienes qe recargar la pagina para que se vea el map
-
-        var xS = 64, yS = 64;
-        var terrainScene = THREE.Terrain({
-            //easing: THREE.Terrain.Linear,
-            //frequency: 2.5,
-            //heightmap: THREE.Terrain.DiamondSquare,
-            heightmap: heightmapImage,
-            maxHeight: 100,
-            minHeight: -10,
-            //steps: 5,
-            useBufferGeometry: false,
-            xSegments: xS,
-            xSize: 2048,
-            ySegments: yS,
-            ySize: 2048,
-        });
-
-
-       terrainScene.receiveShadow = true;
-       terrainScene.castShadow = true;
-      var loader = new THREE.TextureLoader();
-
-      var textura = loader.load (textura);
-        textura.wrapS = textura.wrapT = THREE.RepeatWrapping;
-        textura.repeat = new THREE.Vector2(32,32);
-
-       var material = new THREE.MeshLambertMaterial({map:textura});
-
-
-       var ground = new Physijs.HeightfieldMesh(
-           terrainScene.children[0].geometry,
-            material,
-            0 //mass
-        );
-
-        ground.rotation.x = -0.5 * Math.PI;
-
-        this.terrainScene = ground;
-       this.add(ground);
-
-       var box = new Physijs.BoxMesh(
-            new THREE.CubeGeometry(50,50,50),
-           new THREE.MeshStandardMaterial({color: 0x0000ff}),
-           10
-       );
-
-       box.position.y = 200;
-       box.castShadow = true;
-       box.receiveShadow = true;
-
-       //this.add(box);
-
+  createWater() {
 
         var waterGeometry = new THREE.PlaneGeometry(2048, 2048, 16, 16);
 
@@ -352,7 +296,7 @@ class TheScene extends Physijs.Scene {
         );*/
 
 
-        this.water.position.y = -5;
+        this.water.position.y = -95;
         this.water.rotation.x = -0.5 * Math.PI;
         //this.water = water;
         this.add(this.water);
