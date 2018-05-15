@@ -90,26 +90,31 @@ function onkeyDown(event) {
         case 68: // d
             scene.player.right();
             break;
-        case 67:
+        case 67: //c
             scene.changeCamera();
             break;
-
     }
 }
 
 
 function onkeyUp(event) {
-    var keyCode = event.code;
+    var keyCode = event.keyCode;
     //keyCode = keyCode.toLowerCase();
     //console.log(keyCode);
     //console.log("Key up" + keyCode);
 
     switch (keyCode) {
+        case 69: //e
+            scene.player.animate("drive");
+            break;
+        case 67:
+            break;
         default:
             scene.player.stopPlayer();
          break;
     }
 }
+
 
 
 /// It processes the window size changes
@@ -136,13 +141,6 @@ function render() {
   if(!rend)
     return;
   requestAnimationFrame(render);
-  
-  stats.update();
-  scene.simulate();
-  scene.update();
-    TWEEN.update();
-  //scene.getCameraControls().update ();
-  scene.animate(GUIcontrols);
 
     var views = scene.getActualView();
     for(var i = 0; i<views.length;i++){
@@ -198,6 +196,18 @@ $(function () {
     createGUI(true);
 
     scene = new TheScene (renderer.domElement);
+    scene.simulate( undefined, 1 );
+    scene.addEventListener(
+        'update',
+        function() {
+            stats.update();
+            scene.simulate( undefined, 2 );
+            scene.update();
+            TWEEN.update();
+            //scene.getCameraControls().update ();
+            scene.animate(GUIcontrols);
+        }
+    );
 
     render();
 

@@ -103,6 +103,16 @@ class Player{
         this.mixer = new THREE.AnimationMixer( object );
         scene.mixers.push( this.mixer );
 
+        var stick = new THREE.Mesh(
+            new THREE.CylinderGeometry(3,3,50,16),
+            new THREE.MeshBasicMaterial({color:0xffffff})
+        );
+
+        stick.position.y = -25;
+        //stick.rotation.z = Math.PI * 0.5;
+
+        var hand = phy.getObjectByName("mixamorigLeftHandThumb2");
+        //hand.add(stick);
 
         phy.traverse( function ( child ) {
             if ( child.isMesh ) {
@@ -154,7 +164,7 @@ class Player{
             return;
 
         this.mixer.clipAction( this.animations[name] ).play();
-
+        console.log("animation: " + name);
     }
 
     stopAnimation(){
@@ -195,7 +205,7 @@ class Player{
         distance.normalize();
         distance.multiplyScalar(-100);
 
-        this.physic.applyCentralImpulse(distance);
+        this.physic.setLinearVelocity(distance);
         this.animate("walking");
     }
 
@@ -232,6 +242,7 @@ class Player{
         this.physic.setLinearVelocity({x:0,y:0,z:0});
         this.stopAnimation();
         this.animate("idle");
+        console.log("animation stopped");
 
     }
 

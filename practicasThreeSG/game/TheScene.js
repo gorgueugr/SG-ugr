@@ -18,6 +18,7 @@ class TheScene extends Physijs.Scene {
       this.terrainScene = null;
       this.tree = null;
       this.player = null;
+      this.ball = null;
 
       this.clock = new THREE.Clock();
       this.mixers = [];
@@ -390,6 +391,7 @@ class TheScene extends Physijs.Scene {
 
     createModels() {
         this.player = new Player(this);
+        this.ball = new Ball(this);
 
         //this.actualView = this.player.view;
 
