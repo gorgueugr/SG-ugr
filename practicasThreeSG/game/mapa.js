@@ -1,6 +1,6 @@
 class Mapa {
     constructor (scene) {
-
+        this.fog= null;
         this.heightmap_calle = null;
         this.heightmap_bunker = null;
         this.heightmap_bosque = null;
@@ -143,7 +143,10 @@ class Mapa {
     createMap(scene) {
         this.loadImage(scene);
         //this.iniciaZonas(scene);
-        //this.creaAgua(scene);
+        this.creaAgua(scene);
+
+
+
         this.pelota = new Physijs.BoxMesh(
             new THREE.SphereGeometry(20,100,100),
             new THREE.MeshStandardMaterial({color: 0xffffff}),
@@ -180,7 +183,7 @@ class Mapa {
                     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
                 }),
                 alpha: 1.0,
-                sunDirection: this.sunSphere.position.clone().normalize(),
+                //sunDirection: this.sunSphere.position.clone().normalize(),
                 sunColor: 0xffffff,
                 waterColor: 0x005BC5,
                 distortionScale:  3.7,
@@ -197,9 +200,9 @@ class Mapa {
         );*/
 
 
-        this.water.position.y = -5;
+        this.water.position.y = -95;
         this.water.rotation.x = -0.5 * Math.PI;
-        //this.water = water;
+
         scene.add(this.water);
     }
 }
