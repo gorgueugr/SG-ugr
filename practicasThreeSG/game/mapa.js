@@ -1,7 +1,10 @@
-class Mapa{
+class Mapa {
     constructor (scene) {
 
         this.heightmap_calle = null;
+        this.heightmap_bunker = null;
+        this.heightmap_bosque = null;
+        this.heightmap_green = null;
 
 
         this.material_calle = null;
@@ -19,10 +22,7 @@ class Mapa{
         this.ground_bosque = null;
         this.ground_green = null;
 
-        this.box_calle = null;
-        this.box_bunker = null;
-        this.box_bosque = null;
-        this.box_green = null;
+        this.pelota=null;
 
         this.createMap(scene);
     }
@@ -36,10 +36,18 @@ class Mapa{
         };
         heightmap_calle.src = 'imgs/prueba.png';
         this.heightmap_calle = heightmap_calle;
+
+        ///Inicializacion calle
+        var heightmap_bunquer = new Image();
+        var that = this;
+        heightmap_bunquer.onload = function () {
+            that.iniciaZonas(scene);
+        };
+        heightmap_bunquer.src = 'imgs/bunkerPhotoS.png';
+        this.heightmap_bunker = heightmap_bunquer;
     }
     iniciaZonas(scene){
-
-
+        ////////CALLE//////////////////////////
 
         var xS = 64, yS = 64;
         this.terreno_calle = THREE.Terrain({
@@ -58,6 +66,7 @@ class Mapa{
             ySize: 1024,
         });
 
+
         this.terreno_calle.receiveShadow = true;
         this.terreno_calle.castShadow = true;
         var loader = new THREE.TextureLoader();
@@ -66,31 +75,68 @@ class Mapa{
         textura_calle.wrapS = textura_calle.wrapT = THREE.RepeatWrapping;
         textura_calle.repeat = new THREE.Vector2(32,32);
 
-        this.material_calle = new THREE.MeshLambertMaterial({map:textura_calle});
-
+        this.material_calle = new Physijs.createMaterial(
+            new THREE.MeshLambertMaterial({map:textura_calle}),
+            .8, // high friction
+            0.6 //  restitution
+        );
 
         this.ground_calle = new Physijs.HeightfieldMesh(
             this.terreno_calle.children[0].geometry,
             this.material_calle,
             0 //mass
         );
+
         this.ground_calle.rotation.x = -0.5 * Math.PI;
         scene.add(this.ground_calle);
 
         console.log("mapa añadido");
         console.log(this.terreno_calle);
+        ///////////////////////////////////Bunker//////////////////////
 
-        this.box_calle = new Physijs.BoxMesh(
-            new THREE.CubeGeometry(50,50,50),
-            new THREE.MeshStandardMaterial({color: 0x0000ff}),
-            10
+        this.terreno_bunker = THREE.Terrain({
+            easing: THREE.Terrain.Linear,
+            useBufferGeometry: false,
+            frequency: 2.5,
+            //heightmap: THREE.Terrain.DiamondSquare,
+            heightmap:  this.heightmap_bunker,
+            material: new THREE.MeshBasicMaterial({color: 0x5566aa}),
+            maxHeight: 100,
+            minHeight: -100,
+            steps: 1,
+            xSegments: xS,
+            xSize: 1024,
+            ySegments: yS,
+            ySize: 1024,
+        });
+
+
+        this.terreno_bunker.receiveShadow = true;
+        this.terreno_bunker.castShadow = true;
+        var loader = new THREE.TextureLoader();
+
+        var textura_bunker= loader.load ("imgs/grassGround.jpg"); //textura bunker
+        textura_bunker.wrapS = textura_bunker.wrapT = THREE.RepeatWrapping;
+        textura_bunker.repeat = new THREE.Vector2(32,32);
+
+        this.material_bunker = new Physijs.createMaterial(
+            new THREE.MeshLambertMaterial({map:textura_bunker}),
+            .8, // high friction
+            0.6 //  restitution
         );
 
-        this.box_calle.position.y = 200;
-        this.box_calle.castShadow = true;
-        this.box_calle.receiveShadow = true;
+        this.ground_bunker = new Physijs.HeightfieldMesh(
+            this.terreno_bunker.children[0].geometry,
+            this.material_bunker,
+            0 //mass
+        );
 
-        scene.add(this.box_calle);
+        this.ground_bunker.rotation.x = -0.5 * Math.PI;
+        scene.add(this.ground_bunker);
+
+        console.log("mapa añadido");
+        console.log(this.terreno_bunker);
+
 
     }
 
@@ -98,6 +144,28 @@ class Mapa{
         this.loadImage(scene);
         //this.iniciaZonas(scene);
         //this.creaAgua(scene);
+        this.pelota = new Physijs.BoxMesh(
+            new THREE.SphereGeometry(20,100,100),
+            new THREE.MeshStandardMaterial({color: 0xffffff}),
+            5000
+        );
+
+        this.pelota.position.y = 300;
+        this.pelota.castShadow = true;
+        this.pelota.receiveShadow = true;
+
+        scene.add(this.pelota);
+        this.pelota = new Physijs.BoxMesh(
+            new THREE.SphereGeometry(20,100,100),
+            new THREE.MeshStandardMaterial({color: 0xffffff}),
+            5000
+        );
+
+        this.pelota.position.y = 200;
+        this.pelota.castShadow = true;
+        this.pelota.receiveShadow = true;
+
+        scene.add(this.pelota);
 
     }
     creaAgua(scene){
