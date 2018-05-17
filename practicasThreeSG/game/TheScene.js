@@ -225,14 +225,15 @@ class TheScene extends Physijs.Scene {
       }
 
       //Para que el player no rote dentro de las fisicas
-      if(this.player.physic != null)
-          this.player.physic.__dirtyRotation = true;
+      //if(this.player.physic != null)
+       //   this.player.physic.__dirtyRotation = true;
 
 
       //Para las animaciones
       for ( var i = 0; i < this.mixers.length; i ++ ) {
           this.mixers[ i ].update( this.clock.getDelta() );
       }
+
   }
 
   /// It returns the camera
@@ -400,7 +401,78 @@ class TheScene extends Physijs.Scene {
         //this.add(player.model);
     }
 
+    hitAnimation(){
+      var pos = this.ball.model.position.clone();
+      pos.add(new THREE.Vector3(-10,25,0));
+      this.player.physic.position.copy(pos);
+      this.player.physic.setLinearFactor(new THREE.Vector3(0,0,0));
+      this.ball.model.setLinearFactor(new THREE.Vector3(0,0,0));
+
+      //this.player.physic.add(this.ball.model);
+       // this.ball.model.position.copy(pos);
+
+
+      this.player.physic.__dirtyPosition = true;
+      console.log(pos);
+      this.player.stopAnimation();
+      var action = this.player.animate("drive");
+      action.paused = true;
+      var that = this;
+      action.addEventListener("finished",function (e) {
+          that.player.physic.setLinearFactor(new THREE.Vector3(1,1,1));
+          that.ball.model.setLinearFactor(new THREE.Vector3(1,1,1));
+      });
+    }
+
+
+    prepareHit(){
+        this.actualView = this.ball.view;
+    }
+
+
+    forward(){
+        switch (applicationMode){
+            case TheScene.NO_ACTION:
+                this.player.forward();
+                break;
+        }
+    }
+
+    backward(){
+        switch (applicationMode){
+            case TheScene.NO_ACTION:
+                this.player.backward();
+                break;
+        }
+    }
+
+    right(){
+        switch (applicationMode){
+            case TheScene.NO_ACTION:
+                this.player.right();
+                break;
+        }
+    }
+
+    left(){
+        switch (applicationMode){
+            case TheScene.NO_ACTION:
+                this.player.left();
+                break;
+        }
+    }
+
+
+
+
+
 }
+
+
+TheScene.NO_ACTION;
+TheScene.PLAYER_MOVE;
+TheScene.SETTING_HIT;
+TheScene.FOLLOWING_BALL;
 
 
 

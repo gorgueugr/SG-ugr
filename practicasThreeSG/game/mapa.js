@@ -146,7 +146,7 @@ class Mapa {
         //this.creaAgua(scene);
 
 
-
+        /*
         this.pelota = new Physijs.BoxMesh(
             new THREE.SphereGeometry(20,100,100),
             new THREE.MeshStandardMaterial({color: 0xffffff}),
@@ -168,7 +168,7 @@ class Mapa {
         this.pelota.castShadow = true;
         this.pelota.receiveShadow = true;
 
-        scene.add(this.pelota);
+        scene.add(this.pelota);*/
 
     }
     creaAgua(scene){

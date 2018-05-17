@@ -73,22 +73,22 @@ function onkeyDown(event) {
     switch (keyCode) {
         case 38: // up
         case 87: // w
-            scene.player.forward();
+            scene.forward();
             break;
 
         case 40: // down
         case 83: // s
-            scene.player.backward();
+            scene.backward();
             break;
 
         case 37: // left
         case 65: // a
-            scene.player.left();
+            scene.left();
             break;
 
         case 39: // right
         case 68: // d
-            scene.player.right();
+            scene.right();
             break;
         case 67: //c
             scene.changeCamera();
@@ -104,6 +104,9 @@ function onkeyUp(event) {
     //console.log("Key up" + keyCode);
 
     switch (keyCode) {
+        case 70: //f
+            scene.prepareHit();
+            break;
         case 69: //e
             scene.player.animate("drive");
             break;
@@ -141,6 +144,14 @@ function render() {
   if(!rend)
     return;
   requestAnimationFrame(render);
+    stats.update();
+    scene.simulate( undefined, 1 );
+    scene.update();
+    TWEEN.update();
+    //scene.getCameraControls().update ();
+    scene.animate(GUIcontrols);
+
+
 
     var views = scene.getActualView();
     for(var i = 0; i<views.length;i++){
@@ -197,17 +208,7 @@ $(function () {
 
     scene = new TheScene (renderer.domElement);
     scene.simulate( undefined, 1 );
-    scene.addEventListener(
-        'update',
-        function() {
-            stats.update();
-            scene.simulate( undefined, 2 );
-            scene.update();
-            TWEEN.update();
-            //scene.getCameraControls().update ();
-            scene.animate(GUIcontrols);
-        }
-    );
+
 
     render();
 

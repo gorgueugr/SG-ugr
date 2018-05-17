@@ -6,7 +6,7 @@ class Player{
         this.camera = null;
         this.mixer = null;
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
-        this.camera.position.set (0,500,1000);
+        this.camera.position.set (0,500,2000);
         this.controls = new THREE.PointerLockControls( this.camera );
 
 
@@ -76,20 +76,31 @@ class Player{
         var modelBbox = new THREE.Box3();
         modelBbox.setFromObject( object );
 
-        var height = modelBbox.max.y - modelBbox.min.y;
+        console.log("Box player:");
+        console.log(modelBbox);
 
-        object.translateY(-height/2 - 100);
-        object.rotation.y = Math.PI;
+        var sizeY = modelBbox.max.y - modelBbox.min.y;
+        var sizeX =  modelBbox.max.x - modelBbox.min.x;
+        var sizeZ = modelBbox.max.z - modelBbox.min.z;
+
         //object.updateMatrix();
+        object.rotation.y = Math.PI;
+        object.position.y -= sizeY * 0.5 + 110;
 
         //var geo =  new THREE.Geometry();
-        var geo =  new THREE.CylinderGeometry( 20, 20, height, 2 );
+        var geo =  new THREE.CubeGeometry( sizeZ, sizeY , sizeZ );
 
-        //geo.translate(0,height/2,0);
+        //geo.translate(0,sizeY*0.5,0);
+
+        var material = new Physijs.createMaterial(
+            new THREE.MeshBasicMaterial({opacity:0,transparent: true }),
+            0.9,
+            0.1
+        );
 
         var phy = new Physijs.CapsuleMesh(
             geo,
-            new THREE.MeshBasicMaterial({opacity:1,transparent: false }),
+            material,
             10000
         );
 
@@ -112,7 +123,7 @@ class Player{
         //stick.rotation.z = Math.PI * 0.5;
 
         var hand = phy.getObjectByName("mixamorigLeftHandThumb2");
-        //hand.add(stick);
+        hand.add(stick);
 
         phy.traverse( function ( child ) {
             if ( child.isMesh ) {
@@ -142,6 +153,11 @@ class Player{
         phy.add(this.camera);
         this.camera.lookAt(phy.position);
         scene.add(phy);
+        phy.addEventListener("ready", function(){
+            phy.setAngularFactor(new THREE.Vector3(0, 0, 0));
+        });
+
+
         scene.add(this.controls.getObject());
         this.animate("idle");
 
@@ -163,8 +179,10 @@ class Player{
         if(this.animations[name] == null)
             return;
 
-        this.mixer.clipAction( this.animations[name] ).play();
-        console.log("animation: " + name);
+        var action = this.mixer.clipAction( this.animations[name] );
+        action.setLoop(THREE.LoopOnce, 0);
+        action.play();
+        return action;
     }
 
     stopAnimation(){
@@ -205,6 +223,7 @@ class Player{
         distance.normalize();
         distance.multiplyScalar(-100);
 
+        distance.y = this.physic.getLinearVelocity().y;
         this.physic.setLinearVelocity(distance);
         this.animate("walking");
     }
@@ -237,7 +256,6 @@ class Player{
     stopPlayer(){
         if(this.physic == null)
             return;
-
         this.physic.setAngularVelocity({x:0,y:0,z:0});
         this.physic.setLinearVelocity({x:0,y:0,z:0});
         this.stopAnimation();
