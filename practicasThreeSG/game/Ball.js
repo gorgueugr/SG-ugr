@@ -31,6 +31,9 @@ class Ball{
             1000
         );
 
+
+
+
         model.setCcdMotionThreshold(1);
 
         model.setCcdSweptSphereRadius(0.2);
