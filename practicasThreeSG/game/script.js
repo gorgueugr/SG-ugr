@@ -71,6 +71,9 @@ function onkeyDown(event) {
     //keyCode = keyCode.toLowerCase();
     //console.log("Key down" + keyCode);
     switch (keyCode) {
+        case 32:
+            scene.ball.tirar();
+            break;
         case 38: // up
         case 87: // w
             scene.forward();
@@ -104,10 +107,13 @@ function onkeyUp(event) {
     //console.log("Key up" + keyCode);
 
     switch (keyCode) {
+
         case 70: //f
-            scene.prepareHit();
+            //scene.prepareHit();
+            scene.hitAnimation();
             break;
         case 69: //e
+            scene.player.stopAnimation();
             scene.player.animate("drive");
             break;
         case 67:

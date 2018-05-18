@@ -1,12 +1,10 @@
 class Ball{
     constructor(scene){
         this.model = null;
-        this.createModel();
 
         this.vector = null;
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
         this.camera.position.set (0,10,100);
-        this.model.position.y = 350;
         this.arrowHelper = null;
         //this.model.position.x = 50;
         this.view = [{
@@ -16,30 +14,30 @@ class Ball{
             height: 1.0,
             camera: this.camera
         }];
+        this.createModel();
         scene.add(this.model);
     };
     createModel(){
         var geo = new THREE.SphereGeometry(1);
         var material = new Physijs.createMaterial(
             new THREE.MeshBasicMaterial({color:0xffffff}),
-            0.9,
-            0.3
+            0.9, //friction
+            0.3 //restitution
         );
 
-        var model = new Physijs.SphereMesh(
+        var model = new Physijs.BoxMesh(
             geo,
             material,
-            100
+            1000
         );
 
         model.setCcdMotionThreshold(1);
 
-        model.setCcdSweptSphereRadius(1);
+        model.setCcdSweptSphereRadius(0.2);
 
         var obj = new THREE.Object3D();
         model.add(obj);
         obj.position.z = -1;
-
         model.add(this.camera);
 
         this.vector = obj;
@@ -54,9 +52,9 @@ class Ball{
         var length = 100;
         var hex = 0xff0000;
 
-        this.arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
+        var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
         model.add(arrowHelper);
-
+        model.position.y = 350;
         this.model = model;
     }
 
@@ -71,6 +69,11 @@ class Ball{
 
     }
     left(){
+
+    }
+
+    tirar(){
+        this.model.applyCentralImpulse({x:0,y:1000,z:-1001});
 
     }
 

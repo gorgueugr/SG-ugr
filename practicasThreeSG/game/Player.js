@@ -101,7 +101,7 @@ class Player{
         var phy = new Physijs.CapsuleMesh(
             geo,
             material,
-            10000
+            10
         );
 
         phy.receiveShadow = true;
@@ -122,7 +122,7 @@ class Player{
         stick.position.y = -25;
         //stick.rotation.z = Math.PI * 0.5;
 
-        var hand = phy.getObjectByName("mixamorigLeftHandThumb2");
+        var hand = phy.getObjectByName("mixamorigLeftForeArm");
         hand.add(stick);
 
         phy.traverse( function ( child ) {
@@ -229,28 +229,28 @@ class Player{
     }
 
     right(){
-        this.rotate(-Math.PI * 0.25);
+        this.rotate(-1);
     }
 
     left(){
         //this.physic.rotation.y += Math.PI * 0.25;
-        this.rotate(Math.PI * 0.25);
+        this.rotate(1);
+    }
+
+    jump(){
+        if(this.physic == null)
+            return;
+
+        console.log("Jumping");
+        this.physic.applyCentralImpulse({x:0,y:1000,z:0});
     }
 
     rotate(angle){
         if(this.physic == null)
             return;
 
-        var actual = {g:this.physic.rotation.y};
-        var goal = {g:this.physic.rotation.y + angle};
-        var that = this;
-        var rotation = new TWEEN.Tween(actual)
-            .to(goal)
-            .easing(TWEEN.Easing.Quadratic.InOut)
-            .onUpdate(function() {
-                that.physic.rotation.y = actual.g;
-            })
-            .start();
+        this.physic.setAngularVelocity({x:0,y:angle,z:0});
+        this.animate("walking");
     }
 
     stopPlayer(){

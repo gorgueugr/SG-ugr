@@ -77,7 +77,7 @@ class Mapa {
 
         this.material_calle = new Physijs.createMaterial(
             new THREE.MeshLambertMaterial({map:textura_calle}),
-            .8, // high friction
+            0.8, // high friction
             0.6 //  restitution
         );
 
