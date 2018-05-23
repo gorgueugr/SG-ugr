@@ -427,6 +427,8 @@ class TheScene extends Physijs.Scene {
 
     prepareHit(){
         this.actualView = this.ball.view;
+        this.ball.settingMode();
+        applicationMode = TheScene.SETTING_HIT;
     }
 
 
@@ -434,6 +436,9 @@ class TheScene extends Physijs.Scene {
         switch (applicationMode){
             case TheScene.NO_ACTION:
                 this.player.forward();
+                break;
+            case TheScene.SETTING_HIT:
+                this.ball.forward();
                 break;
         }
     }
@@ -443,6 +448,9 @@ class TheScene extends Physijs.Scene {
             case TheScene.NO_ACTION:
                 this.player.backward();
                 break;
+            case TheScene.SETTING_HIT:
+                this.ball.backward();
+                break;
         }
     }
 
@@ -451,6 +459,9 @@ class TheScene extends Physijs.Scene {
             case TheScene.NO_ACTION:
                 this.player.right();
                 break;
+            case TheScene.SETTING_HIT:
+                this.ball.right();
+                break;
         }
     }
 
@@ -458,6 +469,9 @@ class TheScene extends Physijs.Scene {
         switch (applicationMode){
             case TheScene.NO_ACTION:
                 this.player.left();
+                break;
+            case TheScene.SETTING_HIT:
+                this.ball.left();
                 break;
         }
     }
@@ -469,10 +483,10 @@ class TheScene extends Physijs.Scene {
 }
 
 
-TheScene.NO_ACTION;
-TheScene.PLAYER_MOVE;
-TheScene.SETTING_HIT;
-TheScene.FOLLOWING_BALL;
+TheScene.NO_ACTION = 0;
+TheScene.PLAYER_MOVE = 1;
+TheScene.SETTING_HIT = 2;
+TheScene.FOLLOWING_BALL = 3;
 
 
 

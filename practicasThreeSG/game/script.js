@@ -109,8 +109,8 @@ function onkeyUp(event) {
     switch (keyCode) {
 
         case 70: //f
-            //scene.prepareHit();
-            scene.hitAnimation();
+            scene.prepareHit();
+            //scene.hitAnimation();
             break;
         case 69: //e
             scene.player.stopAnimation();

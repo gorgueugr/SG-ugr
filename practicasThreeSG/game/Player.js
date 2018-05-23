@@ -180,7 +180,8 @@ class Player{
             return;
 
         var action = this.mixer.clipAction( this.animations[name] );
-        action.setLoop(THREE.LoopOnce, 0);
+        if(name=="drive")
+            action.setLoop(THREE.LoopOnce, 0);
         action.play();
         return action;
     }
