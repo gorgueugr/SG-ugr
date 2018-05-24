@@ -7,8 +7,6 @@ class Mapa {
         this.calle = new Zona('imgs/calle.png','imgs/grassGround1.jpg',0.6,0.7,scene);
         this.frontera = new Zona('imgs/exteriores.png','imgs/groundTierra.jpg',0.8,0.3,scene);
 
-
-        this.meta = new Meta(scene,500,15,-700,10)
     }
 }
 

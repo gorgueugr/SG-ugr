@@ -1,12 +1,14 @@
 class Ball{
     constructor(scene){
         this.model = null;
+        this.cero = new THREE.Vector3(0,0,0);
+        this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
+        this.camera.position.set (0,0,100);
 
-        this.vector = null;
-        this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
-        this.camera.position.set (0,25,100);
+        this.vectorObject = null;
+
         this.arrowHelper = null;
-        //this.model.position.x = 50;
+        this.scene = scene;
         this.view = [{
             left: 0,
             top: 0,
@@ -16,6 +18,7 @@ class Ball{
         }];
         this.createModel();
         scene.add(this.model);
+
         var that = this;
         this.model.addEventListener("ready",function () {
             that.model.setAngularFactor({x:0,y:0,z:0});
@@ -25,86 +28,119 @@ class Ball{
         var geo = new THREE.SphereGeometry(1);
         var material = new Physijs.createMaterial(
             new THREE.MeshBasicMaterial({color:0xffffff}),
-            0.9, //friction
+            1, //friction
             0.3 //restitution
         );
 
-        var model = new Physijs.BoxMesh(
+        var model = new Physijs.SphereMesh(
             geo,
             material,
-            1
+            10
         );
+
+        model.setDamping(0.2,0.1);
 
         model.setCcdMotionThreshold(1);
 
-        model.setCcdSweptSphereRadius(0.2);
+        model.setCcdSweptSphereRadius(0.5);
 
-        var obj = new THREE.Object3D();
-        model.add(obj);
-        obj.position.z = -1;
+
+        var vector = new THREE.Object3D();
+        model.add(vector);
+        this.vectorObject = vector;
+
+
+
+        var length = 25;
+        var hex = 0xff0000;
+        var direction = new THREE.Vector3(0,0,1);
+        this.arrowHelper = new THREE.ArrowHelper(direction.normalize(),model.position, length, hex );
+        this.arrowHelper.visible = false;
+
+
+        model.add(this.arrowHelper);
         model.add(this.camera);
 
-        this.vector = obj;
-
-        this.arrowHelper = new THREE.Object3D();
-        this.arrowHelper.visible = false;
-        model.add(this.arrowHelper);
-
-        model.position.y = 350;
+        this.camera.lookAt(this.cero);
+        model.position.y = 50;
 
         this.model = model;
     }
 
     forward(){
 
-        this.vector.position.y += this.vector.position.y <= 10 ? 0.5: 0 ;
+
 
     }
     backward(){
 
-        this.vector.position.y += this.vector.position.y >= 1 ? -0.5: 0 ;
-
-
     }
 
     right(){
-
-        this.model.rotation.y += Math.PI * 0.125;
-        this.model.__dirtyRotation = true;
-
+        this.rotate(-1);
     }
-    left(){
 
-        this.model.rotation.y += - Math.PI * 0.125;
-        this.model.__dirtyRotation = true;
+    left(){
+        //this.physic.rotation.y += Math.PI * 0.25;
+        this.rotate(1);
+    }
+
+    rotate(angle){
+        if(this.model == null)
+            return;
+
+        this.model.setAngularVelocity({x:0,y:angle,z:0});
+        //this.model.setAngularVelocity({x:0,y:0,z:0});
+
+        //this.animate("walking");
     }
 
     settingMode(){
 
+        var meta = this.scene.meta.cilindro.position.clone();
+        var bola = this.model.position.clone();
+        var dif = new THREE.Vector3().subVectors(meta,bola).normalize();
 
-        var obj = this.model.position.clone();
-        obj.z -= 10;
-        var origin = this.model.position.clone();
-        this.camera.lookAt(origin);
-        var length = 10;
-        var hex = 0xff0000;
+        var camPos = dif.clone();
+        camPos.multiplyScalar(100);
 
-        var direction = new THREE.Vector3().subVectors(obj, origin);
+        var vecPos = camPos.clone();
 
-       this.arrowHelper = new THREE.ArrowHelper(direction,origin, length, hex );
-       this.model.add(this.arrowHelper);
+        //TODO: Poner un objeto vacio en la direccion de la meta este objeto se usa para calcular la direccion de la flecha
+        // Con los controles se le podra dar o quitar altura con un minimo y un maximo
+        // this.vectorObject , vecPos... Mirar tirar() para ver como se hace.
+
+        camPos.negate();
+        camPos.y = 25;
+
+        this.camera.position.copy(camPos);
+
+        this.camera.lookAt(this.cero);
+       this.arrowHelper.setDirection(dif);
+
+       this.arrowHelper.visible = true;
     }
 
     tirar(){
-        //var dir = this.vector.position.clone();
-        //var dif = new THREE.Vector3();
-        //dif.subVectors(dir,this.model.position.clone());
-        //dif.multiplyScalar(10);
 
-        this.model.applyCentralImpulse({x:0,y:10,z:-100});
-        this.model.remove(this.arrowHelper);
-        //this.arrowHelper.dispose();
+        var vector = new THREE.Vector3();
+        vector.setFromMatrixPosition( this.camera.matrixWorld );
+
+        var ballPos = this.model.position.clone();
+        var dir = new THREE.Vector3();
+
+        dir.subVectors(  ballPos , vector  );
+        dir.normalize();
+        dir.multiplyScalar(500);
+        dir.y = 500;
+
+        this.model.applyCentralImpulse(dir);
+        this.arrowHelper.visible = false;
         applicationMode = TheScene.NO_ACTION;
+    }
+
+    stop(){
+        this.model.setAngularVelocity({x:0,y:0,z:0});
     }
 
 }

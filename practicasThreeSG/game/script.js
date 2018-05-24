@@ -119,7 +119,7 @@ function onkeyUp(event) {
         case 67:
             break;
         default:
-            scene.player.stopPlayer();
+            scene.stop();
          break;
     }
 }

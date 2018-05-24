@@ -33,8 +33,10 @@ class TheScene extends Physijs.Scene {
 
       //this.createLights ();
         this.createWater();
-      this.mapa = null;
+
       this.mapa = new Mapa(this);
+      this.meta = new Meta(this,500,15,-700,10)
+
       //this.add(this.mapa);
 
       this.createModels();
@@ -490,6 +492,16 @@ class TheScene extends Physijs.Scene {
         }
     }
 
+    stop(){
+        switch (applicationMode){
+            case TheScene.NO_ACTION:
+                this.player.stopPlayer();
+                break;
+            case TheScene.SETTING_HIT:
+                this.ball.stop();
+                break;
+        }
+    }
 
 
 

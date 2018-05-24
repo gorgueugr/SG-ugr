@@ -257,8 +257,9 @@ class Player{
     stopPlayer(){
         if(this.physic == null)
             return;
+        var v = this.physic.getLinearVelocity();
         this.physic.setAngularVelocity({x:0,y:0,z:0});
-        this.physic.setLinearVelocity({x:0,y:0,z:0});
+        this.physic.setLinearVelocity({x:0,y:v.y,z:0});
         this.stopAnimation();
         this.animate("idle");
         console.log("animation stopped");
