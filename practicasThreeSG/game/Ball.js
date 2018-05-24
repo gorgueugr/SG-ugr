@@ -1,5 +1,6 @@
-class Ball{
+class Ball {
     constructor(scene){
+
         this.model = null;
 
         this.vector = null;
@@ -16,6 +17,7 @@ class Ball{
         }];
         this.createModel();
         scene.add(this.model);
+
     };
     createModel(){
         var geo = new THREE.SphereGeometry(1);
@@ -30,8 +32,6 @@ class Ball{
             material,
             1000
         );
-
-
 
 
         model.setCcdMotionThreshold(1);
@@ -57,8 +57,10 @@ class Ball{
 
         var arrowHelper = new THREE.ArrowHelper( dir, origin, length, hex );
         model.add(arrowHelper);
-        model.position.y = 350;
+        model.position.y = 150;
+        model.position.x = 50;
         this.model = model;
+
     }
 
     forward(){
@@ -76,7 +78,7 @@ class Ball{
     }
 
     tirar(){
-        this.model.applyCentralImpulse({x:0,y:1000,z:-1001});
+        this.model.applyCentralImpulse({x:0,y:1000,z:-10000});
 
     }
 
