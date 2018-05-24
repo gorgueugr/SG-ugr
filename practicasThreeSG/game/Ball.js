@@ -2,9 +2,14 @@ class Ball{
     constructor(scene){
         this.model = null;
         this.cero = new THREE.Vector3(0,0,0);
+
         this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
         this.camera.position.set (0,0,100);
 
+        this.secondCamera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 5000);
+        this.camera.position.set (50,0,0);
+
+        this.direction = this.cero.clone();
         this.vectorObject = null;
 
         this.arrowHelper = null;
@@ -15,7 +20,15 @@ class Ball{
             width: 1.0,
             height: 1.0,
             camera: this.camera
-        }];
+        },
+            {
+                left: 0.7,
+                top: 0,
+                width: 0.3,
+                height: 0.3,
+                camera: this.secondCamera
+            }
+        ];
         this.createModel();
         scene.add(this.model);
 
@@ -45,8 +58,13 @@ class Ball{
         model.setCcdSweptSphereRadius(0.5);
 
 
-        var vector = new THREE.Object3D();
+        var vector = new THREE.Mesh(
+            new THREE.CubeGeometry(1,1,1,1),
+            new THREE.MeshBasicMaterial()
+        );
         model.add(vector);
+
+        //vector.position.z = -10;
         this.vectorObject = vector;
 
 
@@ -60,20 +78,32 @@ class Ball{
 
         model.add(this.arrowHelper);
         model.add(this.camera);
+        model.add(this.secondCamera);
 
         this.camera.lookAt(this.cero);
+        this.secondCamera.lookAt(this.cero);
         model.position.y = 50;
 
         this.model = model;
     }
 
     forward(){
+        //this.vectorObject.position.y += 5;
 
-
-
+        var dir = this.direction.clone();
+        dir.y += 0.05;
+        dir.normalize();
+        this.updateArrow(dir);
     }
     backward(){
+        //this.vectorObject.position.y -= 5;
+        var dir = this.direction.clone();
+        dir.y -= 0.05;
+        dir.normalize();
+        //var dir = this.calculateArrowDirection();
 
+
+        this.updateArrow(dir);
     }
 
     right(){
@@ -90,52 +120,85 @@ class Ball{
             return;
 
         this.model.setAngularVelocity({x:0,y:angle,z:0});
-        //this.model.setAngularVelocity({x:0,y:0,z:0});
-
-        //this.animate("walking");
+    //TODO:REvisar que se guarde la this.direction cuando se rota
     }
 
     settingMode(){
 
         var meta = this.scene.meta.cilindro.position.clone();
         var bola = this.model.position.clone();
-        var dif = new THREE.Vector3().subVectors(meta,bola).normalize();
+
+        //var dif = new THREE.Vector3().subVectors(meta,bola).normalize();
+        var dif = this.calculateDirection(meta,bola);
 
         var camPos = dif.clone();
         camPos.multiplyScalar(100);
 
         var vecPos = camPos.clone();
 
-        //TODO: Poner un objeto vacio en la direccion de la meta este objeto se usa para calcular la direccion de la flecha
-        // Con los controles se le podra dar o quitar altura con un minimo y un maximo
-        // this.vectorObject , vecPos... Mirar tirar() para ver como se hace.
+        //vecPos.y = 25;
+
+        this.vectorObject.position.copy(vecPos);
 
         camPos.negate();
         camPos.y = 25;
 
         this.camera.position.copy(camPos);
-
         this.camera.lookAt(this.cero);
-       this.arrowHelper.setDirection(dif);
 
-       this.arrowHelper.visible = true;
+        var rot = camPos.clone();
+        rot.applyAxisAngle(new THREE.Vector3(0,1,0),Math.PI * 0.5);
+
+        this.secondCamera.position.copy(rot);
+        this.secondCamera.lookAt(this.cero);
+
+        var dir = this.calculateArrowDirection();
+        this.updateArrow(dir);
+        this.arrowHelper.visible = true;
+    }
+
+
+    calculateDirection(pos1,pos2){
+        var vec = new THREE.Vector3().subVectors(pos1,pos2);
+        vec.normalize();
+       return vec;
+    }
+
+    updateArrow(dir){
+        console.log("dir:",dir);
+        this.direction.copy(dir);
+        this.arrowHelper.setDirection(dir);
+    }
+
+    calculateArrowDirection(){
+        this.vectorObject.updateMatrix();
+        this.model.updateMatrix();
+
+        this.vectorObject.updateMatrixWorld();
+        this.model.updateMatrixWorld();
+        this.arrowHelper.updateMatrixWorld();
+        var vector = new THREE.Vector3();
+        this.vectorObject.getWorldPosition(vector);
+       // vector.setFromMatrixPosition( this.vectorObject.matrixWorld );
+
+        var ballPos = this.model.position.clone();
+        //ballPos.setFromMatrixPosition( this.model.matrixWorld );
+
+        console.log("vector:",vector,);
+        console.log("ballpos:",ballPos);
+        return this.calculateDirection(vector,ballPos);
     }
 
     tirar(){
 
-        var vector = new THREE.Vector3();
-        vector.setFromMatrixPosition( this.camera.matrixWorld );
+       var dir = this.direction.clone();
 
-        var ballPos = this.model.position.clone();
-        var dir = new THREE.Vector3();
-
-        dir.subVectors(  ballPos , vector  );
-        dir.normalize();
         dir.multiplyScalar(500);
-        dir.y = 500;
+        //dir.y = 500;
 
         this.model.applyCentralImpulse(dir);
         this.arrowHelper.visible = false;
+        this.direction = this.cero.clone();
         applicationMode = TheScene.NO_ACTION;
     }
 

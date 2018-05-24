@@ -42,7 +42,7 @@ function createGUI (withStats) {
 
 
     if (withStats)
-            stats = initStats();
+        stats = initStats();
 
 }
 
@@ -210,8 +210,8 @@ $(function () {
         'webkitPointerLockElement' in document;
 
 
-    createGUI(true);
-
+    //createGUI(true);
+    stats = initStats();
     scene = new TheScene (renderer.domElement);
     scene.simulate( undefined, 1 );
 

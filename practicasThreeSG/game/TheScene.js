@@ -281,8 +281,9 @@ class TheScene extends Physijs.Scene {
    * @param anAspectRatio - The new aspect ratio for the camera
    */
   setCameraAspect (anAspectRatio) {
-    this.camera.aspect = anAspectRatio;
-    this.camera.updateProjectionMatrix();
+     var view =  this.getActualView();
+     view.camera.aspect = anAspectRatio;
+      view.camera.aspect.updateProjectionMatrix();
   }
   createWater() {
 
