@@ -7,13 +7,14 @@ class TheScene extends Physijs.Scene {
   
   constructor (renderer) {
     super();
-    
-    // Attributes
+
+
+      // Attributes
       //Gravity of physic world
-      this.setGravity(new THREE.Vector3( 0, -30, 0 ));
+      this.setGravity(new THREE.Vector3( 0, -40, 0 ));
 
       this.background = new THREE.Color( 0x777777 );
-    this.sunSphere = null;
+      this.sunSphere = null;
       this.water = null;
       this.terrainScene = null;
       this.tree = null;
@@ -32,10 +33,12 @@ class TheScene extends Physijs.Scene {
 
       //this.createLights ();
         this.createWater();
+      this.mapa = null;
       this.mapa = new Mapa(this);
       //this.add(this.mapa);
-    this.createModels();
-    this.createAudio();
+
+      this.createModels();
+        this.createAudio();
 
 
 
@@ -71,7 +74,18 @@ class TheScene extends Physijs.Scene {
 
       this.add(this.camera);
   }
-  
+  Colisiones(){
+      //Detectores de colisiones
+      var that = this;
+      floor.map.addEventListener("collide",function (e) {
+          var map = e.map;
+          var o = that.getObjectFromBody(map);
+          if(o instanceof Robot){//Suelo choca con robot
+              that.reset();
+          }
+      });
+
+  }
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
@@ -122,7 +136,7 @@ class TheScene extends Physijs.Scene {
       // Add Sky
       var sky = new THREE.Sky();
 
-      sky.scale.setScalar( 2048 );
+      sky.scale.setScalar( 4096 );
       this.add( sky );
 
       // Add Sun Helper
