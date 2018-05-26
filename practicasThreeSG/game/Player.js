@@ -62,6 +62,23 @@ class Player{
             //exit(),
             //error()
         );
+        loader.load('obj/preHit.fbx' ,
+            function ( object ) {
+                that.addAnimation("preHit",object);
+                //that.addPlayer(scene,player);
+            }//,
+            //exit(),
+            //error()
+        );
+        loader.load('obj/postHit.fbx' ,
+            function ( object ) {
+                that.addAnimation("postHit",object);
+                that.addPlayer(scene,player);
+            }//,
+            //exit(),
+            //error()
+        );
+        /*
         loader.load('obj/Drive.fbx' ,
             function ( object ) {
                 that.addAnimation("drive",object);
@@ -69,7 +86,8 @@ class Player{
             }//,
             //exit(),
             //error()
-        );
+        );*/
+
     }
 
     addPlayer(scene,object){
@@ -113,6 +131,7 @@ class Player{
 
         this.mixer = new THREE.AnimationMixer( object );
         scene.mixers.push( this.mixer );
+
 
         var stick = new THREE.Mesh(
             new THREE.CylinderGeometry(3,3,50,16),
@@ -180,8 +199,10 @@ class Player{
             return;
 
         var action = this.mixer.clipAction( this.animations[name] );
-        if(name=="drive")
+        if(name=="postHit" || name == "preHit")
             action.setLoop(THREE.LoopOnce, 0);
+
+
         action.play();
         return action;
     }

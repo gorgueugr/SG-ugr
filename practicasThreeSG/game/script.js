@@ -71,9 +71,6 @@ function onkeyDown(event) {
     //keyCode = keyCode.toLowerCase();
     //console.log("Key down" + keyCode);
     switch (keyCode) {
-        case 32:
-            scene.ball.tirar();
-            break;
         case 38: // up
         case 87: // w
             scene.forward();
@@ -96,6 +93,14 @@ function onkeyDown(event) {
         case 67: //c
             scene.changeCamera();
             break;
+        case 77: //m
+            if(applicationMode == TheScene.SETTING_HIT)
+                scene.ball.morePower();
+            break;
+        case 76: //l
+            if(applicationMode == TheScene.SETTING_HIT)
+                scene.ball.lessPower();
+            break;
     }
 }
 
@@ -107,14 +112,16 @@ function onkeyUp(event) {
     //console.log("Key up" + keyCode);
 
     switch (keyCode) {
-
+        case 32:
+            scene.tirar();
+            break;
         case 70: //f
             scene.prepareHit();
             //scene.hitAnimation();
             break;
         case 69: //e
             scene.player.stopAnimation();
-            scene.player.animate("drive");
+            scene.player.animate("preHit");
             break;
         case 67:
             break;

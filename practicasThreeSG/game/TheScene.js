@@ -410,41 +410,53 @@ class TheScene extends Physijs.Scene {
     createModels() {
         this.player = new Player(this);
         this.ball = new Ball(this);
-
-        //this.actualView = this.player.view;
-
-        //TODO: Check this https://github.com/Akimoto873/WebGL-Platformer/blob/master/Platform/WebContent/js/charController.js
-        //player.model.position.y = 200;
-        //this.add(player.model);
     }
 
     hitAnimation(){
-      var pos = this.ball.model.position.clone();
-      pos.add(new THREE.Vector3(-10,25,0));
-      this.player.physic.position.copy(pos);
-      this.player.physic.setLinearFactor(new THREE.Vector3(0,0,0));
-      this.ball.model.setLinearFactor(new THREE.Vector3(0,0,0));
-
-      //this.player.physic.add(this.ball.model);
-       // this.ball.model.position.copy(pos);
 
 
-      this.player.physic.__dirtyPosition = true;
-      console.log(pos);
       this.player.stopAnimation();
-      var action = this.player.animate("drive");
-      action.paused = true;
+      var pre = this.player.animate("preHit");
+      //action.resetDuration();
+      //action.paused = true;
+        //this.ball.tirar();
       var that = this;
-      action.addEventListener("finished",function (e) {
-          that.player.physic.setLinearFactor(new THREE.Vector3(1,1,1));
-          that.ball.model.setLinearFactor(new THREE.Vector3(1,1,1));
-      });
+
+
+        var fin = function (e) {
+
+                that.player.physic.setLinearFactor(new THREE.Vector3(1, 1, 1));
+                that.ball.model.setLinearFactor(new THREE.Vector3(1, 1, 1));
+                that.player.stopAnimation();
+                that.player.animate("postHit");
+                that.ball.tirar();
+
+                that.player.mixer.removeEventListener("finished",fin);
+
+
+        };
+      this.player.mixer.addEventListener("finished",fin);
+
     }
 
 
     prepareHit(){
+        var v = this.ball.model.getLinearVelocity();
+        console.log("V:",v);
+        if( v.x >0.05 || v.y >0.05 || v.z >0.05 || v.x <-0.05 || v.y <-0.05 || v.z <-0.05 ) return;
+
         this.actualView = this.ball.view;
         this.ball.settingMode();
+        var pos = this.ball.playerPos.getWorldPosition();
+        this.player.physic.position.copy(pos);
+        this.player.physic.setLinearFactor(new THREE.Vector3(0,0,0));
+        this.ball.model.setLinearFactor(new THREE.Vector3(0,0,0));
+
+        //this.player.physic.add(this.ball.model);
+        // this.ball.model.position.copy(pos);
+
+
+        this.player.physic.__dirtyPosition = true;
         applicationMode = TheScene.SETTING_HIT;
     }
 
@@ -506,6 +518,13 @@ class TheScene extends Physijs.Scene {
 
 
 
+    tirar(){
+      if(applicationMode != TheScene.SETTING_HIT)
+        return;
+      this.hitAnimation();
+      //this.ball.tirar();
+    }
+
 
 }
 
@@ -513,7 +532,6 @@ class TheScene extends Physijs.Scene {
 TheScene.NO_ACTION = 0;
 TheScene.PLAYER_MOVE = 1;
 TheScene.SETTING_HIT = 2;
-TheScene.FOLLOWING_BALL = 3;
 
 
 
