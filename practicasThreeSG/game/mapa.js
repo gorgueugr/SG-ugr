@@ -2,10 +2,10 @@ class Mapa {
     constructor (scene) {
 
         this.pelota=null;
-        this.meta_salida = new Zona('imgs/green2.png','imgs/cespedClaro.jpg',0.35,0.4,scene);
+        this.meta_salida = new Zona('imgs/green2.png','imgs/cespedClaro.jpg',0.35,0.3,scene);
         this.bunker = new Zona('imgs/bunkers.png','imgs/grassGround.jpg',0.99,0.1,scene);
-        this.calle = new Zona('imgs/calle.png','imgs/grassGround1.jpg',0.6,0.7,scene);
-        this.frontera = new Zona('imgs/exteriores.png','imgs/groundTierra.jpg',0.8,0.3,scene);
+        this.calle = new Zona('imgs/calle.png','imgs/grassGround1.jpg',0.8,0.5,scene);
+        this.frontera = new Zona('imgs/exteriores.png','imgs/groundTierra.jpg',0.9,0.01,scene);
 
     }
 }
@@ -46,7 +46,7 @@ class Zona{
             frequency: 2.5,
             //heightmap: THREE.Terrain.DiamondSquare,
             heightmap:  this.heightmap,
-            material: new THREE.MeshBasicMaterial({color: 0x5566aa}),
+            material: new THREE.MeshBasicMaterial({color: 0x5566aa,emissive:0xffffff,emissiveIntensity:0.4}),
             maxHeight: 100,
             minHeight: -100,
             steps: 1,
@@ -89,25 +89,65 @@ class Zona{
 
 class Meta{
     constructor(scene,x,y,z,radio){
-        this.cilindro = new Physijs.CylinderMesh(
+        this.b = false;
+        this.bandera = null;
+
+        this.base = new Physijs.CylinderMesh(
             new THREE.CylinderGeometry(radio,radio,1,20,1),
-            new THREE.MeshStandardMaterial({color: 0xffffff}),
-            1
+            new THREE.MeshStandardMaterial({color: 0x000000,emissive:0x000000,emissiveIntensity:0.5}),
+
         );
-        this.cilindro.position.x = x ;
-        this.cilindro.position.y = y ;
-        this.cilindro.position.z = z ;
+        this.base.position.x = x ;
+        this.base.position.y = y  ;
+        this.base.position.z = z ;
+        this.base.addEventListener( 'collision', function( other_object, relative_velocity, relative_rotation, contact_normal ) {
+            // `this` has collided with `other_object` with an impact speed of `relative_velocity` and a rotational force of `relative_rotation` and at normal `contact_normal`
+            console.log("Se detecta colision");
 
-        scene.add(this.cilindro);
+            if (other_object instanceof Ball) {
+                console.log("La pelota ha tocado el objetivo! Has ganado");
 
-        //Hay que hacer colision Si toca BALL
+            }
+            if(this.b==true) {
+                window.alert("HAS GANADO. Numero de tiros: "+scene.numeroGolpes);
+            }
+            this.b = true;
+        });
 
-        
+        scene.add(this.base);
+        this.construyeMeta(scene);
 
-
-        //-----------------------------------
     }
+    construyeMeta(escena){
+        //this.box.geometry.applyMatrix (new THREE.Matrix4().makeTranslation (0, , 0));
+        /*var palo = new Physijs.CylinderMesh(
+            new THREE.CylinderGeometry(1,1,50,20,1),
+            new THREE.MeshStandardMaterial({color: 0xffffff}),
+            0
 
+        );*/
+        var palo = new THREE.Mesh(
+            new THREE.BoxGeometry(30,10,1,20,1),
+            new THREE.MeshStandardMaterial({color: 0xff0000,emissive:0xff0000,emissiveIntensity:0.5}));
+        palo.position.x = this.base.position.x +15;
+        palo.position.y = this.base.position.y + 45 ;
+        palo.position.z = this.base.position.z ;
+
+        this.bandera = new THREE.Mesh(
+            new THREE.CylinderGeometry(1,1,50,20,1),
+            new THREE.MeshStandardMaterial({color: 0xffffff,emissive: 0xffffff,emissiveIntensity:0.5}));
+        this.bandera.position.x = this.base.position.x ;
+        this.bandera.position.y = this.base.position.y +25;
+        this.bandera.position.z = this.base.position.z ;
+
+        escena.add(this.bandera);
+        escena.add(palo);
+
+
+
+
+
+    }
 
 
 }

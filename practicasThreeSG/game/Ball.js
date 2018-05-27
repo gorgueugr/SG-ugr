@@ -1,5 +1,6 @@
 class Ball{
     constructor(scene){
+
         this.model = null;
         this.cero = new THREE.Vector3(0,0,0);
 
@@ -94,7 +95,9 @@ class Ball{
 
         this.camera.lookAt(this.cero);
         this.secondCamera.lookAt(this.cero);
+        model.position.x = -750;
         model.position.y = 50;
+        model.position.z = 550;
 
         this.model = model;
     }
@@ -161,7 +164,7 @@ class Ball{
 
     settingMode(){
 
-        var meta = this.scene.meta.cilindro.position.clone();
+        var meta = this.scene.meta.base.position.clone();
         var bola = this.model.position.clone();
 
         //var dif = new THREE.Vector3().subVectors(meta,bola).normalize();

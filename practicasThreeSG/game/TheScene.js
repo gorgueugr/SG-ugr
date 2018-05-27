@@ -8,7 +8,7 @@ class TheScene extends Physijs.Scene {
   constructor (renderer) {
     super();
 
-
+    this.numeroGolpes = 0;
       // Attributes
       //Gravity of physic world
       this.setGravity(new THREE.Vector3( 0, -40, 0 ));
@@ -35,7 +35,7 @@ class TheScene extends Physijs.Scene {
         this.createWater();
 
       this.mapa = new Mapa(this);
-      this.meta = new Meta(this,500,15,-700,10)
+      this.meta = new Meta(this,500,-65,-700,10)
 
       //this.add(this.mapa);
 
@@ -414,7 +414,7 @@ class TheScene extends Physijs.Scene {
 
     hitAnimation(){
 
-
+      this.numeroGolpes = this.numeroGolpes+1;
       this.player.stopAnimation();
       var pre = this.player.animate("preHit");
       //action.resetDuration();

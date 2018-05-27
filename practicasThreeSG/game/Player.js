@@ -163,8 +163,9 @@ class Player{
         phy.scale.x = 0.125;
         phy.scale.y = 0.125;
         phy.scale.z = 0.125;
-        phy.position.y = 300;
-        phy.position.z = 100;
+        phy.position.x = -800;
+        phy.position.y = 50;
+        phy.position.z = 600;
 
         console.log("Player:");
         console.log(object);
