@@ -31,7 +31,7 @@ class TheScene extends Physijs.Scene {
       //this.createMap('imgs/prueba.png','imgs/grassGround1.jpg');
       //this.createGrass();
 
-      //this.createLights ();
+      this.createLights ();
         this.createWater();
 
       this.mapa = new Mapa(this);
@@ -91,22 +91,12 @@ class TheScene extends Physijs.Scene {
   /// It creates lights and adds them to the graph
   createLights () {
     // add subtle ambient lighting
-      var ambient = new THREE.AmbientLight( 0x777777, 1 );
-      this.add(ambient);
+      //var ambient = new THREE.AmbientLight( 0x777777, 0 );
+      //this.add(ambient);
 
-     // var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-     // directionalLight.castShadow = true;
-      //this.add(directionalLight);
-
-      //this.statusLight = new THREE.PointLight(0xff0000,1);
-      //this.statusLight.position.set(0,-50,0);
-
-      //this.add( this.statusLight );
-
-
-      var spotLight = new THREE.SpotLight( 0xffffff, 0.9 );
+      var spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
       //spotLight.target = new THREE.Object3D();
-      spotLight.position.set( 500, 500, 500 );
+      spotLight.position.set( 0, 500, 500 );
       spotLight.angle = Math.PI / 4;
       spotLight.penumbra = 0.05;
       spotLight.decay = 2;
@@ -114,8 +104,8 @@ class TheScene extends Physijs.Scene {
       spotLight.castShadow = true;
       spotLight.shadow.mapSize.width = 512;
       spotLight.shadow.mapSize.height = 512;
-      spotLight.shadow.camera.near = 1;
-      spotLight.shadow.camera.far = 1;
+      spotLight.shadow.camera.near = 0.5;
+      spotLight.shadow.camera.far = 500;
       this.add( spotLight );
   }
 

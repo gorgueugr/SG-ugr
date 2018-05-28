@@ -57,8 +57,6 @@ class Zona{
         });
 
 
-        this.terreno.receiveShadow = true;
-        this.terreno.castShadow = true;
         var loader = new THREE.TextureLoader();
 
         var textura= loader.load (ruta_textura); //textura calle
@@ -77,7 +75,13 @@ class Zona{
             0 //mass
         );
 
+        this.ground_zona.castShadow = true;
+        this.ground_zona.receiveShadow = true;
+
         this.ground_zona.rotation.x = -0.5 * Math.PI;
+
+        this.ground_zona.matrixAutoUpdate  = false;
+        this.ground_zona.updateMatrix();
 
         scene.add(this.ground_zona);
         console.log("Mapa inicializado en Zona "+ruta_textura);
