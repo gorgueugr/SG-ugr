@@ -96,7 +96,7 @@ class TheScene extends Physijs.Scene {
 
       var spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
       //spotLight.target = new THREE.Object3D();
-      spotLight.position.set( 0, 500, 500 );
+      spotLight.position.set( 500, 500, 0 );
       spotLight.angle = Math.PI / 4;
       spotLight.penumbra = 0.05;
       spotLight.decay = 2;
@@ -105,7 +105,7 @@ class TheScene extends Physijs.Scene {
       spotLight.shadow.mapSize.width = 512;
       spotLight.shadow.mapSize.height = 512;
       spotLight.shadow.camera.near = 0.5;
-      spotLight.shadow.camera.far = 500;
+      spotLight.shadow.camera.far = 5000;
       this.add( spotLight );
   }
 

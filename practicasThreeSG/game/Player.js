@@ -142,7 +142,7 @@ class Player{
         //stick.rotation.z = Math.PI * 0.5;
 
         var hand = phy.getObjectByName("mixamorigLeftForeArm");
-        hand.add(stick);
+        //hand.add(stick);
 
         phy.traverse( function ( child ) {
             if ( child.isMesh ) {
@@ -198,9 +198,10 @@ class Player{
             return;
 
         var action = this.mixer.clipAction( this.animations[name] );
-        if(name=="postHit" || name == "preHit")
+        if(name=="postHit" || name == "preHit"){
             action.setLoop(THREE.LoopOnce, 0);
-
+            action.reset();
+        }
 
         action.play();
         return action;

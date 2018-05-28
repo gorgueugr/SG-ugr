@@ -192,7 +192,7 @@ class Ball{
         rot.applyAxisAngle(new THREE.Vector3(0,1,0),Math.PI * 0.5);
 
         var playerPos = dif.clone();
-        playerPos.multiplyScalar(25);
+        playerPos.multiplyScalar(10);
         playerPos.applyAxisAngle(new THREE.Vector3(0,1,0),Math.PI * 0.5);
         playerPos.y = 25;
         this.playerPos.position.copy(playerPos);
