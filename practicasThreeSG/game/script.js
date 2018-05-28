@@ -30,15 +30,6 @@ cannonDebugRenderer = null;
  * @param withStats - A boolean to show the statictics or not
  */
 function createGUI (withStats) {
-    GUIcontrols = new function () {
-        //
-
-
-
-    }
-        var gui = new dat.GUI();
-
-
 
 
     if (withStats)

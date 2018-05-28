@@ -7,7 +7,7 @@ class Player{
         this.mixer = null;
         this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 8 * 5000);
         this.camera.position.set (0,500,2000);
-        this.controls = new THREE.PointerLockControls( this.camera );
+        this.camera.lookAt(new THREE.Vector3(0,0,0));
 
 
         this.vectorObject = null;
@@ -171,14 +171,12 @@ class Player{
         console.log(object);
 
         phy.add(this.camera);
-        this.camera.lookAt(phy.position);
         scene.add(phy);
         phy.addEventListener("ready", function(){
             phy.setAngularFactor(new THREE.Vector3(0, 0, 0));
         });
 
 
-        scene.add(this.controls.getObject());
         this.animate("idle");
 
 

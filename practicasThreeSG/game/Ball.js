@@ -93,6 +93,9 @@ class Ball{
         model.add(this.camera);
         model.add(this.secondCamera);
 
+        model.castShadow = true;
+        model.receiveShadow = true;
+
         this.camera.lookAt(this.cero);
         this.secondCamera.lookAt(this.cero);
         model.position.x = -750;
